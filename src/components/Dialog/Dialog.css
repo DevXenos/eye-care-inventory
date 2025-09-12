@@ -1,0 +1,11 @@
+.native-dialog {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	border: 0;
+	outline: none;
+	width: clamp(150px, 90%, 600px);
+	max-height: 90svh;
+	box-shadow: 0 0 5px gray;
+}

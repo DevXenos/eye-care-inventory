@@ -1,0 +1,36 @@
+@use '../../var/color';
+
+.product-card {
+	max-width: 300px;
+	$color-background: white;
+	user-select: none;
+	cursor: pointer;
+	padding: 2rem;
+	width: 100%;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	align-items: center;
+	transition: .3s;
+	gap: 1rem;
+	padding: 1rem;
+	background-color: $color-background;
+
+	&:hover {
+		scale: 1.05;
+	}
+
+	&:active {
+		scale: 1;
+	}
+
+	.name {
+		text-align: center;
+		font-size: 1.2rem;
+	}
+
+	.id {
+		font-size: 1.2rem;
+	}
+}

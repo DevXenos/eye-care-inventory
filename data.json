@@ -1,0 +1,100 @@
+{
+	"products": {
+		"812345678": {
+			"name": "Blue Light Blocking Glasses",
+			"category": "Eyewear",
+			"type": "Anti Blue Light",
+			"brand": "Gamma Ray",
+			"stock": 150,
+			"expiry": null,
+			"costPrice": 1200,
+			"sellPrice": 1800,
+			"imgSrc": "/images/blue-blocking-glasses.png",
+			"supplier": "VisionCare Supplies Co."
+		},
+		"81234567": {
+			"name": "Lubricating Eye Drops",
+			"category": "Medication",
+			"type": "Artificial Tears",
+			"brand": "Systane",
+			"stock": 500,
+			"expiry": "2026-12-31",
+			"costPrice": 300,
+			"sellPrice": 450,
+			"imgSrc": "/images/lubricating-eye-drop.png",
+			"supplier": "Alcon Pharma Ltd."
+		},
+		"81234566": {
+			"name": "Eye Health Supplements",
+			"category": "Supplements",
+			"type": "Lutein + Zeaxanthin",
+			"brand": "Ocuvite",
+			"stock": 300,
+			"expiry": "2025-10-15",
+			"costPrice": 800,
+			"sellPrice": 1200,
+			"imgSrc": "/images/eye-health-supplements.png",
+			"supplier": "Bausch & Lomb Nutritionals"
+		},
+		"81234565": {
+			"name": "Eyelid Cleansing Wipes",
+			"category": "Hygiene",
+			"type": "Anti-Blepharitis",
+			"brand": "Ocusoft",
+			"stock": 200,
+			"expiry": "2025-06-01",
+			"costPrice": 250,
+			"sellPrice": 400,
+			"imgSrc": "/images/eye-lid-wipes.png",
+			"supplier": "Ocusoft Inc."
+		},
+		"81234564": {
+			"name": "Heated Eye Mask",
+			"category": "Therapy",
+			"type": "Dry Eye Relief",
+			"brand": "Bruder",
+			"stock": 120,
+			"expiry": null,
+			"costPrice": 1500,
+			"sellPrice": 2250,
+			"imgSrc": "/images/heated-eye-masked.png",
+			"supplier": "Bruder Healthcare"
+		},
+		"81234563": {
+			"name": "UV Protection Sunglasses",
+			"category": "Eyewear",
+			"type": "Outdoor Protection",
+			"brand": "Ray-Ban",
+			"stock": 180,
+			"expiry": null,
+			"costPrice": 1300,
+			"sellPrice": 1950,
+			"imgSrc": "/images/uv-protection-eye-glasses.png",
+			"supplier": "Luxottica Group"
+		},
+		"81234562": {
+			"name": "Prescription Eye Ointment",
+			"category": "Medication",
+			"type": "Anti-inflammatory",
+			"brand": "Allergan",
+			"stock": 60,
+			"expiry": "2025-08-20",
+			"costPrice": 400,
+			"sellPrice": 600,
+			"imgSrc": "/images/prescription-eye-ointment.png",
+			"supplier": "AbbVie Inc."
+		},
+		"81234561": {
+			"name": "Cooling Eye Gel",
+			"category": "Therapy",
+			"type": "Soothing",
+			"brand": "TheraPearl",
+			"stock": 150,
+			"expiry": "2025-04-10",
+			"costPrice": 500,
+			"sellPrice": 750,
+			"imgSrc": "/images/cooling-eye-gel.png",
+			"supplier": "Bausch Health"
+		}
+	}
+}

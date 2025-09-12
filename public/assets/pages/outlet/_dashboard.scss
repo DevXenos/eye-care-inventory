@@ -1,0 +1,48 @@
+@use '../../var/screen' as screen;
+
+.dashboard-page {
+	display: grid;
+	grid-template-areas: 
+		"title title"
+		"card card"
+		"recent-sales-table line-graph"
+		"top-5-products-table bar-graph";
+	grid-template-columns: 1fr 1fr;
+	grid-template-rows: auto auto 500px 500px;
+
+	@include screen.small {
+		grid-template-areas: 
+			"title"
+			"card"
+			"line-graph"
+			"recent-sales-table"
+			"bar-graph"
+			"top-5-products-table";
+		grid-template-columns: 1fr;
+		grid-template-rows: auto auto auto auto auto auto;
+	}
+
+	.dashboard-title {
+		grid-area: title;
+	}
+	
+	.card-container {
+		grid-area: card;
+	}
+
+	.line-graph {
+		grid-area: line-graph;
+	}
+
+	.recent-sales-table {
+		grid-area: recent-sales-table;
+	}
+
+	.bar-graph {
+		grid-area: bar-graph;
+	}
+
+	.top-5-products-table {
+		grid-area: top-5-products-table;
+	}
+}

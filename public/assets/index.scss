@@ -1,0 +1,23 @@
+@use './global';
+
+@use './components/table';
+@use './components/product-list';
+@use './components/qty-input';
+
+@use './components/card/card';
+@use './components/card/product-card';
+
+@use './components/dialog/edit-stock-dialog';
+
+@use './components/ui/navbar';
+@use './components/ui/topbar';
+
+@use './pages/dashboard-panel';
+
+@use './pages/outlet/dashboard';
+@use './pages/outlet/product-form';
+@use './pages/outlet/view-dialog';
+@use './pages/outlet/create-purchase';
+@use './pages/outlet/generate-barcode';
+@use './pages/outlet/pos';
+
