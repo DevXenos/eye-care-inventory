@@ -1,12 +1,10 @@
 import formatMoney from "../../../utils/formatMoney";
-import Table from "../../../components/UI/Table/Table";
 import formatQty from "../../../utils/formatQty";
 import {
 	LucideArchive,
 	LucideArchiveRestore,
 	LucideBarcode,
 	LucideEye,
-	LucideFilter,
 	LucideFolderArchive,
 	LucidePen,
 	LucidePlus,
@@ -15,7 +13,6 @@ import { ProductType } from "../../../types/ProductType";
 import useProducts from "../../../hooks/useProducts";
 import { toast } from "sonner";
 import { useState } from "react";
-import AnimationButton from "../../../components/material/AnimationButton";
 import { AnimatePresence } from "framer-motion";
 import MaterialDialog from "../../../components/material/MaterialDialog";
 import ProductView from "../../../components/View/ProductView";
@@ -24,13 +21,28 @@ import outletStyles from "../../../constants/outletStyles";
 import StyleSheet from "../../../utils/Stylesheet";
 import { useConfirmDialog } from "../../../context/ConfirmDialogProvider";
 import { Ids } from "../../../constants/Ids";
-import { useSortDialog } from "../../../context/SortDialogProvider";
+import { useQuery } from "../../../context/QueryProvider";
+import {
+	Box,
+	Button,
+	Table,
+	TableBody,
+	TableCell,
+	TableContainer,
+	TableHead,
+	TableRow,
+	TableSortLabel,
+	Typography,
+	Paper,
+	IconButton,
+	Stack,
+} from "@mui/material";
 
-const sortSelection = ["Date", "Name", "Stock", "Expiry", "Cost Price", "Sell Price"];
+type Order = "asc" | "desc";
 
 const Inventory = () => {
+	const { debouncedQuery } = useQuery();
 	const { show } = useConfirmDialog();
-	const { openSortingDialog } = useSortDialog();
 	const { isLoading, products, setArchived, addProduct, updateProduct } = useProducts();
 
 	const [isArchivedOnly, setArchivedOnly] = useState<boolean>(false);
@@ -39,31 +51,52 @@ const Inventory = () => {
 	const [viewProduct, setViewProduct] = useState<ProductType | null>(null);
 
 	// Sorting state
-	const [sortOption, setSortOption] = useState<(typeof sortSelection)[number]>('Date');
-	const [sortAsc, setSortAsc] = useState(true);
+	const [orderBy, setOrderBy] = useState<keyof ProductType>("created");
+	const [order, setOrder] = useState<Order>("desc");
 
-	// Filtered products based on archive
-	const visibleProducts = products.filter((item) => (isArchivedOnly ? item.archived : !item.archived));
+	// Toggle sorting on header click
+	const handleSort = (property: keyof ProductType) => {
+		const isAsc = orderBy === property && order === "asc";
+		setOrder(isAsc ? "desc" : "asc");
+		setOrderBy(property);
+	};
 
-	// Sorted products
-	const sortedProducts = [...visibleProducts].sort((a, b) => {
-		if (!sortOption) return 0;
+	// 🔹 Filter by archived toggle
+	const visibleProducts = products.filter((item) =>
+		isArchivedOnly ? item.archived : !item.archived
+	);
 
-		switch (sortOption) {
-			case 'Date':
-				return sortAsc ? b.created - a.created : a.created - b.created;
-			case "Name":
-				return sortAsc ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
-			case "Stock":
-				return sortAsc ? a.stock - b.stock : b.stock - a.stock;
-			case "Expiry":
-				return sortAsc
+	// 🔹 Apply search filter
+	const searchedProducts = visibleProducts.filter((item) => {
+		if (!debouncedQuery.trim()) return true;
+		const q = debouncedQuery.toLowerCase();
+		return (
+			item.name.toLowerCase().includes(q) ||
+			String(item.stock).includes(q) ||
+			(item.expiry || "").toLowerCase().includes(q) ||
+			String(item.costPrice || "").includes(q) ||
+			String(item.sellPrice || "").includes(q)
+		);
+	});
+
+	// 🔹 Sort data
+	const sortedProducts = [...searchedProducts].sort((a, b) => {
+		const asc = order === "asc";
+		switch (orderBy) {
+			case "created":
+				return asc ? a.created - b.created : b.created - a.created;
+			case "name":
+				return asc ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
+			case "stock":
+				return asc ? a.stock - b.stock : b.stock - a.stock;
+			case "expiry":
+				return asc
 					? (a.expiry || "").localeCompare(b.expiry || "")
 					: (b.expiry || "").localeCompare(a.expiry || "");
-			case "Cost Price":
-				return sortAsc ? (a.costPrice || 0) - (b.costPrice || 0) : (b.costPrice || 0) - (a.costPrice || 0);
-			case "Sell Price":
-				return sortAsc ? (a.sellPrice || 0) - (b.sellPrice || 0) : (b.sellPrice || 0) - (a.sellPrice || 0);
+			case "costPrice":
+				return asc ? (a.costPrice || 0) - (b.costPrice || 0) : (b.costPrice || 0) - (a.costPrice || 0);
+			case "sellPrice":
+				return asc ? (a.sellPrice || 0) - (b.sellPrice || 0) : (b.sellPrice || 0) - (a.sellPrice || 0);
 			default:
 				return 0;
 		}
@@ -75,37 +108,30 @@ const Inventory = () => {
 		const actionPast = isArchivedOnly ? "unarchived" : "archived";
 
 		const handleAction = () => {
-			toast.promise(
-				setArchived(item.id, !isArchivedOnly),
-				{
-					id: Ids.toastArchived,
-					loading: `${actionVerb} ${item.name}...`,
-					success: `${item.name} has been ${actionPast}.`,
-					error: `Failed to ${action} ${item.name}.`,
-					finally: () => {
-						setViewProduct(null);
-					}
-				}
-			);
+			toast.promise(setArchived(item.id, !isArchivedOnly), {
+				id: Ids.toastArchived,
+				loading: `${actionVerb} ${item.name}...`,
+				success: `${item.name} has been ${actionPast}.`,
+				error: `Failed to ${action} ${item.name}.`,
+				finally: () => setViewProduct(null),
+			});
 		};
 
 		show({
 			title: isArchivedOnly ? "Unarchive Item?" : "Archive Item?",
 			message: isArchivedOnly
-				? `Are you sure you want to unarchive "${item.name}"? It will be restored to the active list.`
-				: `Are you sure you want to archive "${item.name}"? It will be moved to the archived list and hidden from active view.`,
+				? `Are you sure you want to unarchive "${item.name}"?`
+				: `Are you sure you want to archive "${item.name}"?`,
 			confirmText: isArchivedOnly ? "Unarchive" : "Archive",
 			dangerText: isArchivedOnly ? "Unarchive" : "Archive",
-			...isArchivedOnly
-				? { onDanger: handleAction }
-				: { onConfirm: handleAction },
+			...(isArchivedOnly ? { onDanger: handleAction } : { onConfirm: handleAction }),
 		});
-	}
+	};
 
 	const handleEdit = (item: ProductType) => {
 		setSelectedProduct(item);
 		setShowForm(true);
-	}
+	};
 
 	const handleSave = async (product: Omit<ProductType, "id" | "created">) => {
 		try {
@@ -125,81 +151,88 @@ const Inventory = () => {
 	};
 
 	return (
-		<div style={outletStyles.container}>
+		<Box>
+
 			{/* Table Actions */}
-			<div style={outletStyles.tableActions}>
-				<AnimationButton onClick={() => { setSelectedProduct(null); setShowForm(true); }}>
-					<LucidePlus />
-					Create Product
-				</AnimationButton>
+			<Stack direction="row" justifyContent={'flex-end'} spacing={2} sx={{ mb: 2 }}>
+				<Button variant="outlined" onClick={() => { setSelectedProduct(null); setShowForm(true); }}>
+					<LucidePlus size={18} /> Create Product
+				</Button>
 
-				<AnimationButton to="../generate-barcode">
-					<LucideBarcode />
-					Generate Bar Code
-				</AnimationButton>
+				<Button variant="outlined" href="/dashboard/generate-barcode">
+					<LucideBarcode size={18} /> Generate Bar Code
+				</Button>
 
-				<AnimationButton onClick={() => setArchivedOnly(!isArchivedOnly)}>
-					<LucideFolderArchive />
+				<Button variant="outlined" onClick={() => setArchivedOnly(!isArchivedOnly)}>
+					<LucideFolderArchive size={18} />
 					{isArchivedOnly ? "View Active" : "View Archived"}
-				</AnimationButton>
-
-				<AnimationButton onClick={() =>
-					openSortingDialog(
-						sortSelection,
-						sortOption,
-						(options, selected) => {
-							if (sortOption === selected) {
-								setSortAsc(!sortAsc); // toggle direction
-							} else {
-								setSortOption(selected);
-								setSortAsc(true); // default ascending
-							}
-						}
-					)
-				}>
-					<LucideFilter />
-					{sortOption ? ` ${sortOption} (${sortAsc ? "↑" : "↓"})` : ""}
-				</AnimationButton>
-			</div>
+				</Button>
+			</Stack>
 
 			{/* Product Table */}
-			<div className="table-container">
-				<h2 className="title">{isArchivedOnly ? "Archived Products" : "Product List"}</h2>
-				<Table
-					isLoading={isLoading}
-					emptyMessage="No Products Found"
-					headers={["Name", "Stock", "Expiration", "Cost Price", "Sell Price", ""]}
-				>
-					{sortedProducts.map((item: ProductType) => (
-						<tr key={item.id}>
-							<td>{item.name}</td>
-							<td>{formatQty(item.stock)}</td>
-							<td>{item?.expiry || "N/A"}</td>
-							<td>{formatMoney(item?.costPrice || 0, "₱")}</td>
-							<td>{formatMoney(item?.sellPrice || 0, "₱")}</td>
-							<td>
-								<div className="actions">
-									<button title="View" className="action" onClick={() => setViewProduct(item)}>
-										<LucideEye />
-									</button>
+			<TableContainer component={Paper}>
+				<Typography variant="h6" sx={{ p: 2 }}>
+					{isArchivedOnly ? "Archived Products" : "Product List"}
+				</Typography>
 
-									<button title="Edit" className="action" onClick={() => handleEdit(item)}>
-										<LucidePen />
-									</button>
-
-									<button
-										title={isArchivedOnly ? "Unarchive" : "Archive"}
-										className="action"
-										onClick={() => handleSetArchive(item)}
+				<Table>
+					<TableHead>
+						<TableRow>
+							{[
+								{ key: "name", label: "Name" },
+								{ key: "stock", label: "Stock" },
+								{ key: "expiry", label: "Expiration" },
+								{ key: "costPrice", label: "Cost Price" },
+								{ key: "sellPrice", label: "Sell Price" },
+							].map((col) => (
+								<TableCell key={col.key}>
+									<TableSortLabel
+										active={orderBy === col.key}
+										direction={orderBy === col.key ? order : "asc"}
+										onClick={() => handleSort(col.key as keyof ProductType)}
 									>
-										{item.archived ? <LucideArchiveRestore /> : <LucideArchive />}
-									</button>
-								</div>
-							</td>
-						</tr>
-					))}
+										{col.label}
+									</TableSortLabel>
+								</TableCell>
+							))}
+							<TableCell align="center">Actions</TableCell>
+						</TableRow>
+					</TableHead>
+
+					<TableBody>
+						{isLoading ? (
+							<TableRow>
+								<TableCell colSpan={6} align="center">Loading...</TableCell>
+							</TableRow>
+						) : sortedProducts.length === 0 ? (
+							<TableRow>
+								<TableCell colSpan={6} align="center">No Products Found</TableCell>
+							</TableRow>
+						) : (
+							sortedProducts.map((item) => (
+								<TableRow key={item.id}>
+									<TableCell>{item.name}</TableCell>
+									<TableCell>{formatQty(item.stock)}</TableCell>
+									<TableCell>{item.expiry || "N/A"}</TableCell>
+									<TableCell>{formatMoney(item.costPrice || 0, "₱")}</TableCell>
+									<TableCell>{formatMoney(item.sellPrice || 0, "₱")}</TableCell>
+									<TableCell align="center">
+										<IconButton onClick={() => setViewProduct(item)} title="View">
+											<LucideEye size={18} />
+										</IconButton>
+										<IconButton onClick={() => handleEdit(item)} title="Edit">
+											<LucidePen size={18} />
+										</IconButton>
+										<IconButton onClick={() => handleSetArchive(item)} title={isArchivedOnly ? "Unarchive" : "Archive"}>
+											{item.archived ? <LucideArchiveRestore size={18} /> : <LucideArchive size={18} />}
+										</IconButton>
+									</TableCell>
+								</TableRow>
+							))
+						)}
+					</TableBody>
 				</Table>
-			</div>
+			</TableContainer>
 
 			<AnimatePresence>
 				{showForm && (
@@ -215,15 +248,15 @@ const Inventory = () => {
 				{viewProduct && (
 					<MaterialDialog closeOnClickOutside onClose={() => setViewProduct(null)}>
 						<ProductView
-							onEdit={(item) => {
-								handleEdit(item);
-								setViewProduct(null);
-							}}
-							onArchived={() => handleSetArchive(viewProduct)} product={viewProduct} onClose={() => setViewProduct(null)} />
+							onEdit={(item) => { handleEdit(item); setViewProduct(null); }}
+							onArchived={() => handleSetArchive(viewProduct)}
+							product={viewProduct}
+							onClose={() => setViewProduct(null)}
+						/>
 					</MaterialDialog>
 				)}
 			</AnimatePresence>
-		</div>
+		</Box>
 	);
 };
 

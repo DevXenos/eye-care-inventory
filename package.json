@@ -3,8 +3,12 @@
 	"version": "0.1.0",
 	"private": true,
 	"dependencies": {
+		"@emotion/react": "^11.14.0",
+		"@emotion/styled": "^11.14.1",
 		"@jtech-works/bottom-sheet": "^3.0.1",
 		"@jtech-works/dialog": "^2.1.0",
+		"@mui/icons-material": "^7.3.2",
+		"@mui/material": "^7.3.2",
 		"@number-flow/react": "^0.5.10",
 		"@react-spring/web": "^10.0.1",
 		"@syncfusion/ej2-react-barcode-generator": "^29.2.7",
@@ -28,7 +32,9 @@
 		"react-hook-form": "^7.62.0",
 		"react-router-dom": "^7.5.0",
 		"react-scripts": "5.0.1",
+		"react-spinners": "^0.17.0",
 		"react-to-print": "^3.1.0",
+		"react-window": "^2.1.1",
 		"receiptline": "^1.16.2",
 		"recharts": "^2.15.3",
 		"sonner": "^2.0.3",
@@ -44,7 +50,8 @@
 		"eject": "react-scripts eject",
 		"sass:watch": "sass --watch --style=compressed --no-source-map ./public/assets/index.scss:./src/index.min.css",
 		"code": "concurrently \"npm run start\" \"npm run sass:watch\"",
-		"firebase": "firebase emulators:start"
+		"firebase": "firebase emulators:start",
+		"local": "concurrently \"npm run start\" \"npm run firebase\""
 	},
 	"eslintConfig": {
 		"extends": [

@@ -1,41 +1,79 @@
 import * as React from "react";
 import { PurchaseProduct, PurchaseType } from "../../types/PurchaseType";
-import Button from "../material/Button";
-import StyleSheet from "../../utils/Stylesheet";
+import {
+	Box,
+	Card,
+	Typography,
+	TextField,
+	Button,
+	MenuItem,
+} from "@mui/material";
 import { toast } from "sonner";
 import useProducts from "../../hooks/useProducts";
 import useSuppliers from "../../hooks/useSuppliers";
 import ProductCard from "../Card/ProductCard";
 import { ProductType } from "../../types/ProductType";
+import useStockHistory from "../../hooks/useStockHistory";
+import usePurchased from "../../hooks/usePurchased";
 
 type PurchaseFormProps = {
-	purchase?: PurchaseType | null; // if editing
-	onSave: (purchase: PurchaseType) => void;
+	purchase?: PurchaseType | null;
 	onCancel?: () => void;
 };
 
-const PurchaseForm: React.FC<PurchaseFormProps> = ({ purchase, onSave, onCancel }) => {
-	const { products: storedProducts } = useProducts();
+const PurchaseForm: React.FC<PurchaseFormProps> = ({ purchase, onCancel }) => {
+	const { products: storedProducts, addStock } = useProducts();
 	const { suppliers } = useSuppliers();
+	const { addStockHistory } = useStockHistory();
+	const { addPurchase, updatePurchase } = usePurchased();
 
 	const [supplier, setSupplier] = React.useState(purchase?.supplier ?? "");
-	const [status, setStatus] = React.useState<PurchaseType["status"]>(purchase?.status ?? "Pending");
-	const [products, setProducts] = React.useState<PurchaseProduct[]>(purchase?.products ?? []);
+	const [status, setStatus] = React.useState<PurchaseType["status"]>(
+		purchase?.status ?? "Pending"
+	);
+	const [products, setProducts] = React.useState<PurchaseProduct[]>(
+		purchase?.products ?? []
+	);
 
-	const handleProductChange = (index: number, key: keyof PurchaseProduct, value: any) => {
+	const isAlreadyReceived = purchase?.status === "Received";
+	const isJustSetToReceived = status === "Received" && !isAlreadyReceived;
 
-		if (purchase) {
-			return toast.error("Cannot edit products from an existing purchase.", { id: "edit-product-error" });
+	const handleProductChange = (
+		index: number,
+		key: keyof PurchaseProduct,
+		value: any
+	) => {
+		const updated = [...products];
+
+		// Clamp receivedQuantity so it cannot exceed ordered quantity
+		if (key === "receivedQuantity") {
+			const maxQty = updated[index].quantity;
+			value = Math.min(Math.max(0, Number(value)), maxQty);
 		}
 
-		const updated = [...products];
+		// Prevent editing completed purchase except receivedQuantity and price if status is Received
+		if (isAlreadyReceived) {
+			if (key === "quantity" || key === "id" || key === "name") {
+				return toast.error("Cannot modify a completed purchase.", {
+					id: "edit-product-error",
+				});
+			}
+		}
+
+		// Disable receivedQuantity & price if status is not Received
+		if ((key === "receivedQuantity" || key === "price") && status !== "Received") {
+			return;
+		}
+
 		updated[index] = { ...updated[index], [key]: value };
 		setProducts(updated);
 	};
 
 	const removeProduct = (index: number) => {
-		if (purchase) {
-			return toast.error("Cannot remove products from an existing purchase.", { id: "remove-product-error" });
+		if (isAlreadyReceived) {
+			return toast.error("Cannot remove from a completed purchase.", {
+				id: "remove-product-error",
+			});
 		}
 		setProducts(products.filter((_, i) => i !== index));
 	};
@@ -43,229 +81,272 @@ const PurchaseForm: React.FC<PurchaseFormProps> = ({ purchase, onSave, onCancel 
 	const addProductFromCard = (product: ProductType) => {
 		const existingIndex = products.findIndex((p) => p.id === product.id);
 		if (existingIndex >= 0) {
-			// Update quantity if product already exists
 			const updated = [...products];
 			updated[existingIndex].quantity += 1;
 			setProducts(updated);
-			toast.success(`${product.name} quantity updated`, { id: "product-updated" });
+			toast.success(`${product.name} quantity updated`, {
+				id: "product-add/updated",
+			});
 			return;
 		}
 
-		// Add new product
-		setProducts((prev) => ([
+		setProducts((prev) => [
 			...prev,
 			{
 				id: product.id,
 				name: product.name,
 				quantity: 1,
 				price: 0,
-			}
-		]));
-		toast.success(`${product.name} added to purchase`, { id: "product-added" });
+			},
+		]);
+		toast.success(`${product.name} added to purchase`, {
+			id: "product-add/updated",
+		});
 	};
 
-	const handleSubmit = (e: React.FormEvent) => {
+	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		if (!supplier) {
-			toast.error("Supplier is required.", { id: "supplier-error" });
-			return;
-		}
-		if (products.length === 0) {
-			toast.error("Please add at least one product.", { id: "no-product" });
-			return;
+
+		// Supplier required if editable
+		if (!isAlreadyReceived && !supplier) return toast.error("Supplier is required.");
+
+		// Must have at least one product
+		if (products.length === 0) return toast.error("Please add at least one product.");
+
+		// Validate each product
+		for (const prod of products) {
+			if (!isAlreadyReceived) {
+				if (!prod.name || prod.name.trim() === "")
+					return toast.error("Product name is required.");
+				if (!prod.quantity || prod.quantity <= 0)
+					return toast.error(`Quantity for ${prod.name} must be greater than 0.`);
+			}
+			if (status === "Received") {
+				if (prod.price == null || prod.price < 0)
+					return toast.error(`Price for ${prod.name} is required.`);
+				if (prod.receivedQuantity == null || prod.receivedQuantity < 0)
+					return toast.error(`Received quantity for ${prod.name} is required.`);
+			}
 		}
 
-		const amount = products.reduce((sum, p) => sum + p.price * p.quantity, 0);
+		// Calculate total amount
+		const amount = products.reduce(
+			(sum, p) => sum + p.price * (p.receivedQuantity ?? p.quantity),
+			0
+		);
 
-		onSave({
+		const purchaseData: PurchaseType = {
 			id: purchase?.id ?? "",
 			supplier,
 			date: Date.now(),
 			status,
 			products,
 			amount,
-		});
+		};
+
+		try {
+			if (!purchase) {
+				await addPurchase(purchaseData);
+				toast.success("Purchase added successfully!");
+			} else {
+				await updatePurchase(purchaseData.id, purchaseData);
+				toast.info("Purchase edited successfully!");
+			}
+
+			if (isJustSetToReceived || status === "Received") {
+				// Update stock & history
+				await Promise.all(
+					products.map(async (prod) => {
+						const oldProd = purchase?.products.find((p) => p.id === prod.id);
+						const oldQty = oldProd?.receivedQuantity ?? 0;
+						const newQty = prod.receivedQuantity ?? prod.quantity ?? 0;
+						const diff = newQty - oldQty;
+
+						if (diff !== 0) {
+							await addStock(prod.id, diff);
+							await addStockHistory({
+								date: Date.now(),
+								productName: prod.name,
+								stockAdjustment: diff,
+							});
+						}
+					})
+				);
+				toast.success("Inventory updated successfully!");
+			}
+
+			if (onCancel) onCancel();
+		} catch (err) {
+			console.error(err);
+			toast.error("Failed to save purchase.");
+		}
 	};
 
 	return (
-		<form style={styles.form} onSubmit={handleSubmit}>
-			<h2 style={styles.title}>{purchase ? "Edit Purchase" : "Add Purchase"}</h2>
+		<Box
+			component="form"
+			onSubmit={handleSubmit}
+			sx={{ display: "flex", flexDirection: "column", gap: 3, p: 3 }}
+		>
+			<Typography variant="h5" textAlign="center">
+				{purchase ? "Edit Purchase" : "Add Purchase"}
+			</Typography>
 
-			<div style={styles.content}>
+			<Box
+				sx={{
+					display: "flex",
+					flexDirection: { xs: "column", md: "row" },
+					gap: 3,
+				}}
+			>
+				{/* Products selection */}
 				{!purchase && (
-					<div style={styles.column}>
-						<h3 style={styles.sectionTitle}>Select Products</h3>
-						<div style={styles.productsGrid}>
+					<Card sx={{ flex: 1, p: 2, minHeight: 300 }}>
+						<Box
+							component="ul"
+							sx={{
+								display: "grid",
+								gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
+								gap: 2,
+								listStyle: "none",
+								p: 0,
+								m: 0,
+							}}
+						>
 							{storedProducts.map((product) => (
-								<ProductCard
-									key={product.id}
-									product={product}
-									onClick={() => addProductFromCard(product)}
-								/>
+								<Box component="li" key={product.id}>
+									<ProductCard
+										product={product}
+										onClick={() => addProductFromCard(product)}
+									/>
+								</Box>
 							))}
-						</div>
-					</div>
+						</Box>
+					</Card>
 				)}
 
-				{/* Purchase form */}
-				<div style={styles.column}>
-					<div style={styles.fieldGroup}>
-						<label style={styles.label}>Supplier *</label>
-						<select
-							style={styles.input}
-							value={supplier}
-							onChange={(e) => setSupplier(e.target.value)}
-							required
-						>
-							{suppliers.map((p, i) => (
-								<option key={i} value={p.shopName} label={p.shopName} />
-							))}
-						</select>
-					</div>
+				{/* Purchase Details */}
+				<Card
+					sx={{
+						flex: 1,
+						p: 2,
+						display: "flex",
+						flexDirection: "column",
+						gap: 2,
+						minHeight: 300,
+					}}
+				>
+					<TextField
+						select
+						label="Supplier"
+						value={supplier}
+						onChange={(e) => setSupplier(e.target.value)}
+						disabled={isAlreadyReceived}
+						required={!isAlreadyReceived}
+					>
+						{suppliers.map((s, i) => (
+							<MenuItem key={i} value={s.shopName}>
+								{s.shopName}
+							</MenuItem>
+						))}
+					</TextField>
 
-					<div style={styles.fieldGroup}>
-						<label style={styles.label}>Status *</label>
-						<select
-							style={styles.input}
-							value={status}
-							onChange={(e) => setStatus(e.target.value as PurchaseType["status"])}
-							disabled={purchase?.status === "Received"} // ❌ Disable if already received
-						>
-							<option value="Pending">Pending</option>
-							<option value="Sent">Sent</option>
-							<option value="Received">Received</option>
-						</select>
-					</div>
+					<TextField
+						select
+						label="Status"
+						value={status}
+						onChange={(e) =>
+							setStatus(e.target.value as PurchaseType["status"])
+						}
+						disabled={isAlreadyReceived}
+					>
+						<MenuItem value="Pending">Pending</MenuItem>
+						<MenuItem value="Sent">Sent</MenuItem>
+						<MenuItem value="Received">Received</MenuItem>
+					</TextField>
 
-					<h3 style={styles.sectionTitle}>Selected Products</h3>
-					{products.map((product, index) => (
-						<div key={index} style={styles.productRow}>
-							<span style={{ flex: 1 }}>{product.name}</span>
+					<Typography variant="subtitle1">Selected Products</Typography>
+					<Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+						{products.map((product, index) => (
+							<Box
+								key={index}
+								sx={{ display: "flex", gap: 1, alignItems: "center" }}
+							>
+								<Typography sx={{ flex: 1 }}>{product.name}</Typography>
 
-							<input
-								style={styles.inputSmall}
-								type="number"
-								min={1}
-								value={product.quantity}
-								onChange={(e) =>
-									handleProductChange(index, "quantity", Number(e.target.value))
-								}
-								required
-							/>
+								<TextField
+									type="number"
+									label="Ordered"
+									value={product.quantity}
+									onChange={(e) =>
+										handleProductChange(index, "quantity", Number(e.target.value))
+									}
+									disabled={isAlreadyReceived}
+									size="small"
+									inputProps={{ min: 1 }}
+									required={!isAlreadyReceived}
+								/>
 
-							<input
-								style={styles.inputSmall}
-								type="number"
-								min={0}
-								value={product.price}
-								onChange={(e) =>
-									handleProductChange(index, "price", Number(e.target.value))
-								}
-								required
-							/>
+								<TextField
+									type="number"
+									label="Received"
+									value={product.receivedQuantity ?? ""}
+									onChange={(e) =>
+										handleProductChange(
+											index,
+											"receivedQuantity",
+											Number(e.target.value)
+										)
+									}
+									disabled={status !== "Received"}
+									size="small"
+									inputProps={{
+										min: 0,
+										max: product.quantity,
+									}}
+									required={status === "Received"}
+								/>
 
-							<Button variant="danger" type="button" onClick={() => removeProduct(index)}>
-								X
-							</Button>
-						</div>
-					))}
+								<TextField
+									type="number"
+									label="Price"
+									value={product.price}
+									onChange={(e) =>
+										handleProductChange(index, "price", Number(e.target.value))
+									}
+									disabled={status !== "Received"}
+									size="small"
+									required={status === "Received"}
+								/>
 
-					<div style={styles.actions}>
-						<Button type="submit">{purchase ? "Update Purchase" : "Add Purchase"}</Button>
+								<Button
+									variant="contained"
+									color="error"
+									onClick={() => removeProduct(index)}
+									disabled={isAlreadyReceived}
+								>
+									X
+								</Button>
+							</Box>
+						))}
+					</Box>
+
+					<Box
+						sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: "auto" }}
+					>
 						{onCancel && (
-							<Button type="button" variant="outline" onClick={onCancel}>
+							<Button variant="outlined" onClick={onCancel}>
 								Cancel
 							</Button>
 						)}
-					</div>
-				</div>
-			</div>
-		</form>
+						<Button variant="contained" type="submit">
+							{purchase ? "Update Purchase" : "Add Purchase"}
+						</Button>
+					</Box>
+				</Card>
+			</Box>
+		</Box>
 	);
 };
 
 export default PurchaseForm;
-
-const styles = StyleSheet.create({
-	form: {
-		flex: 1,
-		display: "flex",
-		flexDirection: "column",
-		gap: 20,
-		padding: 32,
-		background: "#fff",
-		borderRadius: 16,
-	},
-	title: {
-		margin: 0,
-		fontSize: 22,
-		fontWeight: 700,
-		color: "#111",
-		textAlign: "center",
-	},
-	content: {
-		display: "flex",
-		flexDirection: "row",
-		flex: 1,
-		flexWrap: "wrap",
-		gap: 12,
-	},
-	column: {
-		flex: 1,
-		minWidth: 600,
-		display: "flex",
-		flexDirection: "column",
-		gap: 12,
-	},
-	productsGrid: {
-		display: "grid",
-		gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
-		gap: 16,
-		width: "100%",
-	},
-	fieldGroup: {
-		display: "flex",
-		flexDirection: "column",
-		gap: 6,
-	},
-	label: {
-		fontSize: 14,
-		fontWeight: 500,
-		color: "#333",
-	},
-	sectionTitle: {
-		color: "#007bff",
-		margin: "20px 0 10px",
-		fontSize: 18,
-		textTransform: "uppercase",
-		letterSpacing: 1,
-		display: "flex",
-		justifyContent: "space-between",
-		alignItems: "center",
-	},
-	productRow: {
-		display: "flex",
-		flexDirection: "row",
-		gap: 10,
-		alignItems: "center",
-	},
-	input: {
-		padding: "10px 12px",
-		borderRadius: 8,
-		border: "1px solid #ddd",
-		fontSize: 15,
-		transition: "all 0.2s",
-	},
-	inputSmall: {
-		flex: 1,
-		padding: "8px 10px",
-		borderRadius: 8,
-		border: "1px solid #ddd",
-		fontSize: 14,
-	},
-	actions: {
-		display: "flex",
-		gap: 12,
-		marginTop: "auto",
-	},
-});

@@ -1,9 +1,27 @@
-import { LucideArchive, LucideArchiveRestore, LucideEye, LucideFilter, LucideFolderArchive, LucidePen, LucidePlus, LucideView } from "lucide-react";
+import {
+	LucideEye,
+	LucideFolderArchive,
+	LucidePen,
+	LucidePlus,
+} from "lucide-react";
 import * as React from "react";
-import Table from "../../../components/UI/Table/Table";
-import AnimationButton from "../../../components/material/AnimationButton";
+import {
+	Box,
+	Button,
+	IconButton,
+	Paper,
+	Table,
+	TableBody,
+	TableCell,
+	TableContainer,
+	TableHead,
+	TableRow,
+	Typography,
+	TableSortLabel,
+	Stack,
+} from "@mui/material";
 import PurchaseForm from "../../../components/Form/PurchasedForm";
-import MaterialDialog from "../../../components/material/MaterialDialog"; // your modal/dialog component
+import MaterialDialog from "../../../components/material/MaterialDialog";
 import { PurchaseType } from "../../../types/PurchaseType";
 import { toast } from "sonner";
 import usePurchased from "../../../hooks/usePurchased";
@@ -16,29 +34,79 @@ import useStockHistory from "../../../hooks/useStockHistory";
 import useArchivedToggle from "../../../hooks/utils/useArchivedToggle";
 import { useConfirmDialog } from "../../../context/ConfirmDialogProvider";
 import ArchiveButtonIcon from "../../../components/material/ArchiveButtonIcon";
+import { useQuery } from "../../../context/QueryProvider";
+
+// Sorting keys
+type Order = "asc" | "desc";
+type SortKey = "date" | "supplier" | "status" | "amount";
 
 const Purchase: React.FC = () => {
-	const { showArchived, toggleArchived, getArchivedButtonText } = useArchivedToggle();
+	const { showArchived, toggleArchived, getArchivedButtonText } =
+		useArchivedToggle();
 	const { show } = useConfirmDialog();
+	const { query } = useQuery();
 
 	// Hooks
-	const { isLoading, purchases, addPurchase, updatePurchase, setArchived } = usePurchased()
-	const { addStock } = useProducts()
-	const { addStockHistory } = useStockHistory()
+	const { isLoading, purchases, addPurchase, updatePurchase, setArchived } =
+		usePurchased();
+	const { addStock } = useProducts();
+	const { addStockHistory } = useStockHistory();
 
 	const [openForm, setOpenForm] = React.useState(false);
-	const [editingPurchase, setEditingPurchase] = React.useState<PurchaseType | null>(null);
+	const [editingPurchase, setEditingPurchase] =
+		React.useState<PurchaseType | null>(null);
+	const [viewPurchased, setViewPurchased] =
+		React.useState<PurchaseType | null>(null);
 
-	const [viewPurchased, setViewPurchased] = React.useState<PurchaseType | null>(null);
+	// Sorting state
+	const [orderBy, setOrderBy] = React.useState<SortKey>("date");
+	const [order, setOrder] = React.useState<Order>("desc");
 
+	const handleRequestSort = (property: SortKey) => {
+		const isAsc = orderBy === property && order === "asc";
+		setOrder(isAsc ? "desc" : "asc");
+		setOrderBy(property);
+	};
+
+	// Filter + sort
 	const filteredPurchased = purchases
-		.sort((a, b) => b.date - a.date)
 		.filter((p) => {
-			return (p.archived ?? false) === showArchived;
-		})
+			if (!query) return true;
+			const search = query.toLowerCase();
 
+			return (
+				p.supplier.toLowerCase().includes(search) ||
+				p.status.toLowerCase().includes(search) ||
+				String(p.amount).toLowerCase().includes(search) ||
+				p.products.some((prod) =>
+					prod.name.toLowerCase().includes(search)
+				)
+			);
+		})
+		.filter((p) => (p.archived ?? false) === showArchived)
+		.slice()
+		.sort((a, b) => {
+			let cmp = 0;
+			switch (orderBy) {
+				case "date":
+					cmp = a.date - b.date;
+					break;
+				case "supplier":
+					cmp = a.supplier.localeCompare(b.supplier);
+					break;
+				case "status":
+					cmp = a.status.localeCompare(b.status);
+					break;
+				case "amount":
+					cmp = a.amount - b.amount;
+					break;
+			}
+			return order === "asc" ? cmp : -cmp;
+		});
+
+	// Handlers
 	const handleCreate = () => {
-		setEditingPurchase(null); // new purchase
+		setEditingPurchase(null);
 		setOpenForm(true);
 	};
 
@@ -47,28 +115,14 @@ const Purchase: React.FC = () => {
 		setEditingPurchase(null);
 	};
 
-	const handleSavePurchase = (purchase: PurchaseType, original?: PurchaseType) => {
+	const handleSavePurchase = (
+		purchase: PurchaseType,
+		original?: PurchaseType
+	) => {
 		const isEditing = !!purchase.id;
 		const promises: Promise<any>[] = [];
 
-		if (isEditing) {
-			promises.push(updatePurchase(purchase.id, purchase));
-
-			// Use original to check if status changed
-			if (original?.status !== "Received" && purchase.status === "Received") {
-				purchase.products.forEach((p) => {
-					promises.push(addStock(p.id, p.quantity));
-					promises.push(
-						addStockHistory({
-							productName: p.name,
-							stockAdjustment: p.quantity,
-							date: Date.now(),
-						})
-					);
-				});
-			}
-		} else {
-			// New purchase
+		if (!isEditing) {
 			promises.push(addPurchase(purchase));
 
 			if (purchase.status === "Received") {
@@ -94,8 +148,7 @@ const Purchase: React.FC = () => {
 		handleCloseForm();
 	};
 
-	// Handle archive function
-	const handleArchive = (purchase: PurchaseType) => { 
+	const handleArchive = (purchase: PurchaseType) => {
 		setViewPurchased(null);
 
 		const handleAction = () => {
@@ -112,91 +165,128 @@ const Purchase: React.FC = () => {
 			dangerText: "Archive",
 			confirmText: "Unarchive",
 		});
-	}
+	};
 
 	const handleEdit = (purchase: PurchaseType) => {
 		setViewPurchased(null);
 		setEditingPurchase(purchase);
-		setOpenForm(true); // open the form modal
+		setOpenForm(true);
 	};
-	
+
 	return (
-		<div className="outlet purchased-page">
-			<div className="table-actions">
-				<AnimationButton onClick={handleCreate}>
-					<LucidePlus />
+		<Box>
+			<Stack direction="row" justifyContent="flex-end" spacing={2} sx={{ mb: 2 }}>
+				<Button
+					variant="outlined"
+					startIcon={<LucidePlus />}
+					onClick={handleCreate}
+				>
 					Create Purchase
-				</AnimationButton>
+				</Button>
 
-				<AnimationButton onClick={toggleArchived}>
-					<LucideFolderArchive />
+				<Button
+					variant="outlined"
+					startIcon={<LucideFolderArchive />}
+					onClick={toggleArchived}
+				>
 					{getArchivedButtonText()}
-				</AnimationButton>
+				</Button>
+			</Stack>
 
-				<AnimationButton>
-					<LucideFilter />
-				</AnimationButton>
-			</div>
+			<Paper>
+				<Typography variant="h6" p={2}>
+					Purchases
+				</Typography>
 
-			<div className="table-container">
-				<h2 className="title">Purchased</h2>
-				<Table isLoading={isLoading} headers={['Date', 'Supplier', 'Status', 'Amount', '']} emptyMessage="No Purchased Yet">
-					{filteredPurchased.map((purchase) => (
-						<tr key={purchase.id}>
-							<td>{formatDate(purchase.date)}</td>
-							<td>{purchase.supplier}</td>
-							<td>{purchase.status}</td>
-							<td>{formatMoney(purchase.amount, '₱')}</td>
-							<td>
-								<div className="actions">
-									<button title="View" className="action" onClick={() => setViewPurchased(purchase)}>
-										<LucideEye />
-									</button>
+				<TableContainer>
+					<Table>
+						<TableHead>
+							<TableRow>
+								{["date", "supplier", "status", "amount"].map((key) => (
+									<TableCell key={key}>
+										<TableSortLabel
+											active={orderBy === key}
+											direction={orderBy === key ? order : "asc"}
+											onClick={() => handleRequestSort(key as SortKey)}
+										>
+											{key.charAt(0).toUpperCase() + key.slice(1)}
+										</TableSortLabel>
+									</TableCell>
+								))}
+								<TableCell align="right">Actions</TableCell>
+							</TableRow>
+						</TableHead>
 
-									<button
-										title="Edit"
-										className="action"
-										onClick={() => handleEdit(purchase)} // Use the handleEdit function
-									>
-										<LucidePen />
-									</button>
+						<TableBody>
+							{filteredPurchased.length === 0 && !isLoading && (
+								<TableRow>
+									<TableCell colSpan={5} align="center">
+										No Purchases Yet
+									</TableCell>
+								</TableRow>
+							)}
 
-									<button
-										title={purchase.archived ? "Unarchive" : "Archive"}
-										className="action"
-										onClick={() => handleArchive(purchase)}
-									>
-										<ArchiveButtonIcon archived={purchase.archived} />
-									</button>
+							{filteredPurchased.map((purchase) => (
+								<TableRow key={purchase.id}>
+									<TableCell>{formatDate(purchase.date)}</TableCell>
+									<TableCell>{purchase.supplier}</TableCell>
+									<TableCell>{purchase.status}</TableCell>
+									<TableCell>{formatMoney(purchase.amount, "₱")}</TableCell>
+									<TableCell align="right">
+										<IconButton onClick={() => setViewPurchased(purchase)}>
+											<LucideEye />
+										</IconButton>
+										<IconButton onClick={() => handleEdit(purchase)}>
+											<LucidePen />
+										</IconButton>
+										<IconButton onClick={() => handleArchive(purchase)}>
+											<ArchiveButtonIcon archived={purchase.archived} />
+										</IconButton>
+									</TableCell>
+								</TableRow>
+							))}
+						</TableBody>
+					</Table>
+				</TableContainer>
+			</Paper>
 
-								</div>
-							</td>
-						</tr>
-					))}
-				</Table>
-			</div>
-
-			{/* Modal for Purchase Form */}
 			<AnimatePresence>
-				{/* View */}
 				{viewPurchased && (
-					<MaterialDialog closeOnClickOutside closeOnEsc onClose={setViewPurchased}>
-						<PurchaseView purchase={viewPurchased} onClose={() => setViewPurchased(null)} onEdit={(purchase) => handleEdit(purchase)} onArchive={(purchase) => handleArchive(purchase)} />
+					<MaterialDialog
+						closeOnClickOutside
+						closeOnEsc
+						onClose={setViewPurchased}
+					>
+						<PurchaseView
+							purchase={viewPurchased}
+							onClose={() => setViewPurchased(null)}
+							onEdit={(purchase) => handleEdit(purchase)}
+							onArchive={(purchase) => handleArchive(purchase)}
+						/>
 					</MaterialDialog>
 				)}
 
-				{/* Form */}
 				{openForm && (
-					<MaterialDialog contentStyle={{ minWidth: 700, width: editingPurchase ? "50%" : "100%", minHeight: "100%", borderRadius: 12 }} closeOnClickOutside={false} closeOnEsc onClose={handleCloseForm}>
+					<MaterialDialog
+						contentStyle={{
+							minWidth: 700,
+							width: editingPurchase ? "60%" : "100%",
+							minHeight: "100%",
+							borderRadius: 12,
+						}}
+						closeOnClickOutside={false}
+						closeOnEsc
+						onClose={handleCloseForm}
+					>
 						<PurchaseForm
 							purchase={editingPurchase}
-							onSave={handleSavePurchase}
+							// onSave={handleSavePurchase}
 							onCancel={handleCloseForm}
 						/>
 					</MaterialDialog>
 				)}
 			</AnimatePresence>
-		</div>
+		</Box>
 	);
 };
 

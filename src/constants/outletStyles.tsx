@@ -13,12 +13,14 @@ const outletStyles = StyleSheet.create({
 	actionsContainer: {
 		width: "100%",
 		display: "grid",
-		gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", // responsive grid
+		gridTemplateColumns: "repeat(auto-fit, minmax(200px, 400px))", // responsive grid
+		placeContent: "center",
 		gap: 16,
 	},
 
 	// Action button base
 	actionsBtn: {
+		// maxWidth: 300,
 		height: 48,
 		display: "flex",
 		alignItems: "center",

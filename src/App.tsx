@@ -13,34 +13,58 @@ import Suppliers from "./pages/Dashboard/outlet/Suppliers";
 import Notifications from "./pages/Dashboard/outlet/Notifications";
 import SalesReport from "./pages/Dashboard/outlet/SalesReport";
 import Dropdown from "./TestPage";
+import { QueryProvider } from "./context/QueryProvider";
+import useCurrentUser from "./hooks/useCurrentUser";
+import { ThemeProvider } from "@mui/material/styles";
+import { theme } from "./constants/theme";
+import CssBaseline from "@mui/material/CssBaseline";
+import NoAccess from "./pages/NoAccess";
+import LoadingPage from "./pages/LoadingPage";
 
 const App: React.FC = () => {
+	const { isLoading, currentUser } = useCurrentUser();
+
+	if (isLoading) {
+		return (
+			<LoadingPage/>
+		);
+	}
+
 	return (
-		<BrowserRouter>
-			<Routes>
-				<Route index element={<AdminAuthForm />} />
-				<Route path='/dashboard' element={<DashboardPanel />} >
-					<Route index element={<Dashboard />} />
+		<ThemeProvider theme={theme}>
 
-					<Route path='generate-barcode' element={<GenerateBarCode />} />
+			<CssBaseline />
 
-					<Route path='notifications' element={<Notifications />} />
+			<BrowserRouter>
+				<QueryProvider>
+					<Routes>
+						<Route index element={<AdminAuthForm />} />
+						<Route path='/dashboard' element={currentUser ? <DashboardPanel /> : <NoAccess />}>
+							<Route index element={<Dashboard />} />
 
-					<Route path='inventory' element={<Inventory />} />
-					<Route path='stock-history' element={<StockHistory />} />
-					<Route path='suppliers' element={<Suppliers />} />
-					<Route path="sales-report" element={<SalesReport/>} />
+							<Route path='generate-barcode' element={<GenerateBarCode />} />
 
-					<Route path="purchase" element={<Purchase />} />
+							{currentUser && (
+								<>
+									<Route path='notifications' element={<Notifications />} />
+									<Route path='inventory' element={<Inventory />} />
+									<Route path='stock-history' element={<StockHistory />} />
+									<Route path='suppliers' element={<Suppliers />} />
+									<Route path="sales-report" element={<SalesReport />} />
+									<Route path="purchase" element={<Purchase />} />
+									<Route path='pos' element={<POS />} />
+									<Route path='settings' element={<Settings />} />
+								</>
+							)}
+						</Route>
 
-					<Route path='pos' element={<POS />} />
+						<Route path="/test" element={<Dropdown />} />
 
-					<Route path='settings' element={<Settings />} />
-				</Route>
-
-				<Route path="/test" element={<Dropdown/>} />
-			</Routes>
-		</BrowserRouter>
+						<Route path="*" element={<NoAccess />} />
+					</Routes>
+				</QueryProvider>
+			</BrowserRouter>
+		</ThemeProvider>
 	);
 }
 

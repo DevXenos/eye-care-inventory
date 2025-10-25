@@ -1,7 +1,6 @@
 import * as React from "react";
 import { ProductType } from "../../types/ProductType";
-import StyleSheet from "../../utils/Stylesheet";
-import Colors from "../../constants/Colors";
+import { Card, CardContent, CardMedia, Typography, Box, Chip } from "@mui/material";
 
 interface ProductCardProps {
 	onClick?: (product: ProductType) => void;
@@ -10,84 +9,70 @@ interface ProductCardProps {
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, onClick }) => {
 	return (
-		<div
-			style={styles.container}
-			onClick={() => {
-				onClick?.(product);
+		<Card
+			onClick={() => onClick?.(product)}
+			sx={{
+				cursor: "pointer",
+				display: "flex",
+				flexDirection: "column",
+				alignItems: "center",
+				p: 2,
+				position: "relative",
+				height: "100%", // ensures equal height in a grid
+				transition: "transform 0.2s, box-shadow 0.2s",
+				"&:hover": {
+					transform: "translateY(-4px)",
+					boxShadow: 6,
+				},
 			}}
 		>
 			{/* Category Badge */}
-			<span style={styles.category}>{product.category}</span>
+			<Chip
+				label={product.category}
+				size="small"
+				color="primary"
+				sx={{ position: "absolute", top: 8, left: 8 }}
+			/>
 
 			{/* Product Image */}
-			<div style={styles.imageWrapper}>
-				<img src={product.imgSrc} alt={product.name} style={styles.image} />
-			</div>
+			<Box
+				sx={{
+					display: "flex",
+					alignItems: "center",
+					justifyContent: "center",
+					width: "100%",
+					minHeight: 100,
+					mb: 2,
+				}}
+			>
+				<CardMedia
+					component="img"
+					image={product.imgSrc}
+					alt={product.name}
+					sx={{ maxWidth: "80%", maxHeight: 100, objectFit: "contain" }}
+				/>
+			</Box>
 
 			{/* Name */}
-			<p style={styles.name}>{product.name}</p>
+			<Typography
+				variant="subtitle1"
+				fontWeight={600}
+				textAlign="center"
+				sx={{ minHeight: 24, mb: 1, userSelect: "none" }}
+			>
+				{product.name}
+			</Typography>
 
 			{/* ID bottom-right */}
-			<span style={styles.id}>#{product.id}</span>
-		</div>
+			<Typography
+				variant="body2"
+				color="text.secondary"
+				sx={{ position: "absolute", bottom: 8, right: 8 }}
+			>
+				#{product.id}
+			</Typography>
+		</Card>
 	);
 };
 
 export default ProductCard;
-
-const styles = StyleSheet.create({
-	container: {
-		userSelect: "none",
-		position: "relative",
-		background: Colors.card,
-		borderRadius: 12,
-		boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-		display: "flex",
-		flexDirection: "column",
-		alignItems: "center",
-		padding: 16,
-		cursor: "pointer",
-		transition: "transform 0.2s ease, box-shadow 0.2s ease",
-		overflow: "hidden",
-	},
-
-	category: {
-		position: "absolute",
-		top: 8,
-		left: 8,
-		background: Colors.primary,
-		color: "white",
-		fontSize: 12,
-		fontWeight: "bold",
-		padding: "2px 8px",
-		borderRadius: 8,
-	},
-
-	imageWrapper: {
-		flex: 1, // ensures equal reserved space across cards
-		display: "flex",
-		alignItems: "center",
-		justifyContent: "center",
-		width: "100%",
-		minHeight: 100, // consistent height area for images
-	},
-
-	image: {
-		maxWidth: "80%",
-		maxHeight: 100,
-		objectFit: "contain",
-	},
-
-	name: {
-		fontSize: 16,
-		fontWeight: "600",
-		textAlign: "center",
-		marginTop: 12,
-		minHeight: 24, // reserve space so all names align
-	},
-
-	id: {
-		fontSize: 16,
-		color: "gray",
-	},
-});

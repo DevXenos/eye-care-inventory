@@ -5,6 +5,7 @@ export type PurchaseProduct = {
 	name: string;           // store name at purchase time
 	quantity: number;       // quantity purchased
 	price: number;          // purchase price per unit
+	receivedQuantity?: number;
 };
 
 export type PurchaseType = {

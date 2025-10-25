@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, connectAuthEmulator } from 'firebase/auth';
 import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
-import { getDatabase, connectDatabaseEmulator } from 'firebase/database';
+import { getDatabase, connectDatabaseEmulator, Database } from 'firebase/database';
 
 const firebaseConfig = {
 	apiKey: "AIzaSyCL5LM_4fIAJZPHzE2rixydyHRjgbQ22bQ",
@@ -16,6 +16,13 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const firestore = getFirestore(app);
 const database = getDatabase(app);
+// const database = (() => {
+// 	const err = new Error();
+// 	const stack = err.stack?.split("\n").slice(2).join("\n"); // skip first 2 lines for clarity
+// 	throw new Error(
+// 		`Realtime Database is disabled! Please convert to Firestore.\nAccessed from:\n${stack}`
+// 	);
+// })() as Database;
 
 if (window.location.host.includes("localhost")) {
 	connectAuthEmulator(auth, 'http://localhost:8001', {disableWarnings: true});

@@ -7,17 +7,16 @@ import { Toaster } from 'sonner';
 import DialogContextProvider from '@jtech-works/dialog';
 import { ConfirmDialogProvider } from './context/ConfirmDialogProvider';
 import { SortDialogProvider } from './context/SortDialogProvider';
+import { QueryProvider } from './context/QueryProvider';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLDivElement);
 root.render(
 	<React.StrictMode>
 		<Toaster richColors visibleToasts={5} expand closeButton />
-		<DialogContextProvider animation='opacity' >
-			<ConfirmDialogProvider>
-				<SortDialogProvider>
+			<DialogContextProvider animation='opacity' >
+				<ConfirmDialogProvider>
 					<App />
-				</SortDialogProvider>
-			</ConfirmDialogProvider>
-		</DialogContextProvider>
+				</ConfirmDialogProvider>
+			</DialogContextProvider>
 	</React.StrictMode>
 );

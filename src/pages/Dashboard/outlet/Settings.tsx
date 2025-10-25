@@ -1,198 +1,187 @@
-import {
-	LucideCamera,
-	LucideShieldCheck,
-	LucideTrash2,
-	LucideUserCog,
-} from "lucide-react";
+import { LucideCamera, LucideShieldCheck, LucideUserCog } from "lucide-react";
 import * as React from "react";
-import StyleSheet from "../../../utils/Stylesheet";
-import outletStyles from "../../../constants/outletStyles";
-import combined from "../../../utils/combine";
+import { Box, Button, Card, Avatar, Typography, TextField, Stack } from "@mui/material";
+import { AnimatePresence } from "framer-motion";
+import MaterialDialog from "../../../components/material/MaterialDialog";
+import PasswordForm, { PasswordFormData } from "../../../components/Form/PasswordForm";
+import ProfileForm, { ProfileFormData } from "../../../components/Form/ProfileForm";
 import useCurrentUser from "../../../hooks/useCurrentUser";
+import { toast } from "sonner";
+import { signOut } from "firebase/auth";
+import { auth } from "../../../config/firebaseConfig";
 
 const Settings: React.FC = () => {
-
+	const [showChangePassForm, setShowChangePassForm] = React.useState(false);
+	const [showEditProfile, setShowEditProfile] = React.useState(false);
 	const [threshold, setThreshold] = React.useState<number>(10);
 
-	const { isLoading: isCurrentUserLoading, currentUser } = useCurrentUser();
+	const { isLoading: isCurrentUserLoading, currentUser, changePassword, updateProfileInfo } =
+		useCurrentUser();
 
 	if (isCurrentUserLoading) {
 		return (
-			<div style={outletStyles.container}>
-				<h1>Loading...</h1>
-			</div>
-		)
+			<Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
+				<Typography variant="h6">Loading...</Typography>
+			</Box>
+		);
 	}
 
-	return (
-		<div style={outletStyles.container}>
-			{/* Profile Header */}
-			<div style={styles.header}>
-				<div style={styles.avatarWrapper}>
-					<img src="/placeholder/user.png" alt="User Avatar" style={styles.avatar} />
-					<div style={styles.cameraIcon}>
-						<LucideCamera size={18} />
-					</div>
-				</div>
+	const onChangePassword = ({ currentPassword, newPassword }: PasswordFormData) => {
+		setShowChangePassForm(false);
 
-				<div style={styles.userInfo}>
-					<h2 style={styles.name}>
-						{currentUser?.displayName || 'Name'}
-					</h2>
-					<h3 style={styles.username}>
-						{currentUser?.email || '@justinegonzales'}
-					</h3>
-					<p style={styles.status}>Member since March 2024</p>
-				</div>
-			</div>
+		toast.promise(changePassword(currentPassword, newPassword), {
+			loading: "Changing password...",
+			success: "Password changed successfully.",
+			error: "Failed to change password. Check your current password!",
+		});
+	};
+
+	const onChangeProfile = ({ name, profile }: ProfileFormData) => {
+		setShowEditProfile(false);
+		toast.promise(updateProfileInfo(name, profile), {
+			loading: "Updating profile...",
+			success: "Profile updated successfully.",
+			error: (e) => `Failed to update profile. ${e?.getMessage() ?? ""}`,
+			finally: () => window.location.reload(),
+		});
+	};
+
+	return (
+		<Box maxWidth={600} mx="auto" mt={4} display="flex" flexDirection="column" gap={4}>
+			{/* Profile Header */}
+			<Card sx={{ textAlign: "center", p: 4, borderRadius: 3, boxShadow: 3 }}>
+				<Box position="relative" display="inline-block" mb={2}>
+					<Avatar
+						src={currentUser?.photoURL ?? "/placeholder/user.png"}
+						alt="User Avatar"
+						sx={{ width: 120, height: 120 }}
+					/>
+					<Box
+						position="absolute"
+						bottom={0}
+						right={0}
+						sx={{
+							backgroundColor: "background.paper",
+							borderRadius: "50%",
+							p: 0.5,
+							boxShadow: 1,
+							cursor: "pointer",
+						}}
+					>
+						<LucideCamera size={18} />
+					</Box>
+				</Box>
+				<Typography variant="h5" fontWeight={600}>
+					{currentUser?.displayName || "Name"}
+				</Typography>
+				<Typography variant="body2" color="text.secondary">
+					{currentUser?.email || "@justinegonzales"}
+				</Typography>
+				<Typography variant="caption" color="text.secondary">
+					Member since March 2024
+				</Typography>
+			</Card>
 
 			{/* Quick Actions */}
-			<div style={styles.section}>
-				<h4 style={styles.sectionTitle}>Quick Actions</h4>
-				<div style={outletStyles.actionsContainer}>
-					<button style={outletStyles.actionsBtn}>
-						<LucideUserCog />
-						<span>Edit Profile</span>
-					</button>
-
-					<button style={outletStyles.actionsBtn}>
-						<LucideShieldCheck />
-						<span>Change Password</span>
-					</button>
-
-					<button style={combined(outletStyles.actionsBtn, outletStyles.actionsBtnDanger)}>
-						<LucideTrash2 />
-						<span>Delete Account</span>
-					</button>
-				</div>
-			</div>
+			<Card sx={{ p: 3, borderRadius: 3, boxShadow: 3 }}>
+				<Typography variant="subtitle1" fontWeight={600} mb={2}>
+					Quick Actions
+				</Typography>
+				<Stack direction="row" spacing={2}>
+					<Button
+						variant="outlined"
+						startIcon={<LucideUserCog />}
+						onClick={() => setShowEditProfile(true)}
+						fullWidth
+					>
+						Edit Profile
+					</Button>
+					<Button
+						variant="outlined"
+						startIcon={<LucideShieldCheck />}
+						onClick={() => setShowChangePassForm(true)}
+						fullWidth
+					>
+						Change Password
+					</Button>
+					{/* <Button
+						variant="outlined"
+						color="error"
+						startIcon={<LucideTrash2 />}
+						fullWidth
+					>
+						Delete Account
+					</Button> */}
+				</Stack>
+			</Card>
 
 			{/* Preferences */}
-			<div style={styles.section}>
-				<h4 style={styles.sectionTitle}>Preferences</h4>
-				<div style={styles.formGroup}>
-					<label style={styles.label} htmlFor="stockAlert">
-						Alert me when stock falls to or below:
-					</label>
-					<input
-						id="stockAlert"
+			{/* <Card sx={{ p: 3, borderRadius: 3, boxShadow: 3 }}>
+				<Typography variant="subtitle1" fontWeight={600} mb={2}>
+					Preferences
+				</Typography>
+				<Box display="flex" flexDirection="column" gap={2}>
+					<TextField
+						label="Stock Threshold Alert"
 						type="number"
-						placeholder="Enter stock threshold"
-						style={styles.input}
 						value={threshold}
 						onChange={(e) => setThreshold(Number(e.target.value))}
+						helperText="You'll receive a notification when stock reaches this level."
 					/>
-					<small style={styles.helperText}>
-						You’ll receive a notification when stock reaches this level.
-					</small>
-				</div>
-			</div>
+				</Box>
+			</Card> */}
 
-			<button style={styles.logoutBtn}>Log out</button>
-		</div>
+			<Button
+				variant="contained"
+				color="error"
+				fullWidth
+				sx={{ borderRadius: 2 }}
+				onClick={() => {
+					toast.promise(
+						signOut(auth),
+						{
+							loading: "Signing out...",
+							success: "Logout Successfully!"
+						}
+					)
+				}}
+			>
+				Log out
+			</Button>
+
+			{/* Dialogs */}
+			<AnimatePresence>
+				{showChangePassForm && (
+					<MaterialDialog
+						contentStyle={{ maxWidth: 500, width: "100%" }}
+						closeOnClickOutside
+						onClose={() => setShowChangePassForm(false)}
+					>
+						<PasswordForm
+							onSubmit={onChangePassword}
+							onCancel={() => setShowChangePassForm(false)}
+						/>
+					</MaterialDialog>
+				)}
+
+				{showEditProfile && (
+					<MaterialDialog
+						contentStyle={{ maxWidth: 500, width: "100%" }}
+						closeOnClickOutside
+						onClose={() => setShowEditProfile(false)}
+					>
+						<ProfileForm
+							onSubmit={onChangeProfile}
+							profile={{
+								name: currentUser?.displayName ?? "",
+								profile: currentUser?.photoURL ?? "",
+							}}
+						/>
+					</MaterialDialog>
+				)}
+			</AnimatePresence>
+		</Box>
 	);
 };
 
 export default Settings;
-
-const styles = StyleSheet.create({
-	// Header
-	header: {
-		display: "flex",
-		flexDirection: "column",
-		alignItems: "center",
-		gap: "1rem",
-	},
-
-	avatarWrapper: {
-		position: "relative",
-		width: "120px",
-		height: "120px",
-	},
-
-	avatar: {
-		width: "100%",
-		height: "100%",
-		borderRadius: "50%",
-		objectFit: "cover",
-	},
-
-	cameraIcon: {
-		position: "absolute",
-		bottom: 0,
-		right: 0,
-		background: "#fff",
-		borderRadius: "50%",
-		padding: "6px",
-		boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
-		cursor: "pointer",
-	},
-
-	userInfo: {
-		textAlign: "center",
-	},
-
-	name: {
-		margin: 0,
-		fontSize: "1.6rem",
-		fontWeight: 600,
-	},
-
-	username: {
-		margin: 0,
-		fontSize: "1rem",
-		opacity: 0.7,
-	},
-
-	status: {
-		fontSize: "0.9rem",
-		opacity: 0.6,
-		margin: "0.25rem 0 0",
-	},
-
-	// Sections
-	section: {
-		display: "flex",
-		flexDirection: "column",
-		gap: "1rem",
-	},
-
-	sectionTitle: {
-		fontSize: "1.2rem",
-		fontWeight: 600,
-		margin: 0,
-	},
-
-	// Inputs
-	formGroup: {
-		display: "flex",
-		flexDirection: "column",
-		gap: "0.5rem",
-	},
-
-	label: {
-		fontWeight: 500,
-		fontSize: "1rem",
-	},
-
-	input: {
-		padding: "0.75rem 1rem",
-		borderRadius: "10px",
-		border: "1px solid #ccc",
-		fontSize: "1rem",
-	},
-
-	helperText: {
-		fontSize: "0.85rem",
-		opacity: 0.6,
-	},
-
-	logoutBtn: {
-		...outletStyles.actionsBtn,
-		...outletStyles.actionsBtnDanger,
-		width: "100%",
-		maxWidth: 300,
-		marginLeft: "auto",
-		marginRight: "auto",
-	}
-});
