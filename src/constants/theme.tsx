@@ -20,6 +20,9 @@ export const theme = createTheme({
 	},
 	components: {
 		MuiButton: {
+			'defaultProps': {
+				variant: "contained"
+			},
 			styleOverrides: {
 				root: {
 					height: 48,
@@ -28,6 +31,8 @@ export const theme = createTheme({
 					fontWeight: 600,
 				},
 			},
+			variants: [
+			]
 		},
 	},
 });
