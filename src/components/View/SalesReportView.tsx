@@ -1,7 +1,7 @@
 import * as React from "react";
 import { SalesType } from "../../types/SalesType";
 import StyleSheet from "../../utils/Stylesheet";
-import Button from "../material/Button";
+import { Button } from "@mui/material";
 
 type Props = {
 	sale: SalesType;
@@ -47,8 +47,8 @@ const SalesReportView: React.FC<Props> = ({ sale, onClose, onArchive }) => {
 
 			{/* Actions */}
 			<div style={styles.actions}>
-				<Button variant="primary" style={styles.action}>Print</Button>
-				<Button onClick={() => onArchive(sale)} variant={sale.archived ? "primary" :"danger"} style={styles.action}>
+				<Button variant="contained" style={styles.action}>Print</Button>
+				<Button onClick={() => onArchive(sale)} variant={sale.archived ? "contained" :"outlined"} style={styles.action}>
 					{sale.archived ? "Unarchive":"Archive"}
 				</Button>
 			</div>

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { SupplierType } from "../../types/SupplierType";
 import StyleSheet from "../../utils/Stylesheet";
-import Button from "../material/Button";
+import { Button } from "@mui/material";
 
 type SupplierFormProps = {
 	supplier?: SupplierType | null; // if passed, we're editing
@@ -92,7 +92,7 @@ const SupplierForm: React.FC<SupplierFormProps> = ({ supplier, onSave, onCancel 
 			<div style={styles.actions}>
 				<Button type="submit">{supplier ? "Update Supplier" : "Add Supplier"}</Button>
 				{onCancel && (
-					<Button type="button" variant="outline" onClick={onCancel}>
+					<Button type="button" variant="outlined" onClick={onCancel}>
 						Cancel
 					</Button>
 				)}

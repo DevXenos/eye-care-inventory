@@ -1,7 +1,8 @@
 import * as React from "react";
 import { ProductType } from "../../types/ProductType";
 import StyleSheet from "../../utils/Stylesheet";
-import Button from "../material/Button";
+// import Button from "../material/Button";
+import { Button } from "@mui/material";
 import useArchivedToggle from "../../hooks/utils/useArchivedToggle";
 
 type Props = {
@@ -53,7 +54,7 @@ const ProductView: React.FC<Props> = ({ product, onClose, onArchived, onEdit }) 
 				{/* Actions */}
 				<div style={styles.actions}>
 					<Button onClick={() => onEdit(product)} style={styles.action}>Edit</Button>
-					<Button onClick={() => onArchived()} variant={product.archived ? "primary" : "danger"} style={styles.action}>
+					<Button onClick={() => onArchived()} variant={product.archived ? "contained" : "outlined"} style={styles.action}>
 						{product.archived ? "Unarchived": "Archive"}
 					</Button>
 				</div>

@@ -48,8 +48,8 @@ const useProducts = () => {
 	const addStock = async (id: ProductType["id"], amount: number) => {
 		const stockRef = ref(database, `products/${id}/stock`);
 		await runTransaction(stockRef, (currentStock) => {
-			if (currentStock === null) return amount;
-			return currentStock + amount;
+			const stockNum = Number(currentStock || 0);
+			return stockNum + amount;
 		});
 	};
 

@@ -80,7 +80,7 @@ const NavBar = () => {
 				my: 2,
 				ml: 2,
 				borderRadius: 2,
-				overflow: "auto",
+				overflow: 'auto',
 			}}
 		>
 			{/* Profile section */}
@@ -93,7 +93,10 @@ const NavBar = () => {
 					p: 2,
 				}}
 			>
-				<Avatar src="/placeholder/profile.png" sx={{ width: 64, height: 64 }} />
+				<Avatar
+					src={currentUser?.photoURL || '/placeholder/profile.png'}
+					sx={{ width: 64, height: 64 }}
+				/>
 				<Typography variant="subtitle1" fontWeight={600}>
 					{currentUser?.displayName || ''}
 				</Typography>
@@ -114,12 +117,17 @@ const NavBar = () => {
 								component={Link}
 								to={`/dashboard/${link.links[0]}`}
 								selected={active}
-								sx={{
-									borderRadius: 2,
+								sx={(theme) => ({
 									mb: 0.5,
-								}}
+									borderLeftColor: theme.palette.primary.main,
+									borderLeftStyle: 'solid',
+									transition: '.1s',
+									borderLeftWidth: active ? 3 : 0,
+								})}
 							>
-								<ListItemIcon sx={{ minWidth: 32 }}>{link.materialIcon}</ListItemIcon>
+								<ListItemIcon sx={{ minWidth: 32 }}>
+									{link.materialIcon}
+								</ListItemIcon>
 								<ListItemText primary={link.label} />
 							</ListItemButton>
 						</ListItem>

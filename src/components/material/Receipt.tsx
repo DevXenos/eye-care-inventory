@@ -2,7 +2,21 @@
 import * as React from "react";
 import { useRef } from "react";
 import { useReactToPrint } from "react-to-print";
-import AnimationButton from "../material/AnimationButton";
+import {
+	Box,
+	Button,
+	Typography,
+	Table,
+	TableHead,
+	TableBody,
+	TableRow,
+	TableCell,
+	Divider,
+	Paper,
+	Dialog,
+	DialogContent,
+	DialogActions,
+} from "@mui/material";
 import formatMoney from "../../utils/formatMoney";
 
 // ----------------------
@@ -23,41 +37,55 @@ type ReceiptProps = {
 const Receipt = React.forwardRef<HTMLDivElement, ReceiptProps>(
 	({ customer, carts, total, date }, ref) => {
 		return (
-			<div ref={ref} style={{ padding: 20, fontFamily: "monospace" }}>
-				<h2 style={{ textAlign: "center" }}>🧾 Sales Receipt</h2>
-				<p>Date: {new Date(date).toLocaleString()}</p>
-				<p>Customer: {customer}</p>
-				<hr />
+			<Box ref={ref} p={3} fontFamily="monospace">
+				<Typography variant="h5" align="center" gutterBottom>
+					🧾 Sales Receipt
+				</Typography>
 
-				<table style={{ width: "100%", borderCollapse: "collapse" }}>
-					<thead>
-						<tr>
-							<th align="left">Item</th>
-							<th align="right">Qty</th>
-							<th align="right">Price</th>
-							<th align="right">Subtotal</th>
-						</tr>
-					</thead>
-					<tbody>
-						{carts.map((cart, i) => (
-							<tr key={i}>
-								<td>{cart.productName}</td>
-								<td align="right">{cart.quantity}</td>
-								<td align="right">{formatMoney(cart.productPrice, "₱")}</td>
-								<td align="right">
-									{formatMoney(cart.quantity * cart.productPrice, "₱")}
-								</td>
-							</tr>
-						))}
-					</tbody>
-				</table>
+				<Typography variant="body2">Date: {new Date(date).toLocaleString()}</Typography>
+				<Typography variant="body2" gutterBottom>
+					Customer: {customer}
+				</Typography>
 
-				<hr />
-				<h3 style={{ textAlign: "right" }}>
+				<Divider sx={{ my: 2 }} />
+
+				<Paper variant="outlined">
+					<Table size="small">
+						<TableHead>
+							<TableRow>
+								<TableCell>Item</TableCell>
+								<TableCell align="right">Qty</TableCell>
+								<TableCell align="right">Price</TableCell>
+								<TableCell align="right">Subtotal</TableCell>
+							</TableRow>
+						</TableHead>
+						<TableBody>
+							{carts.map((cart, i) => (
+								<TableRow key={i}>
+									<TableCell>{cart.productName}</TableCell>
+									<TableCell align="right">{cart.quantity}</TableCell>
+									<TableCell align="right">
+										{formatMoney(cart.productPrice, "₱")}
+									</TableCell>
+									<TableCell align="right">
+										{formatMoney(cart.quantity * cart.productPrice, "₱")}
+									</TableCell>
+								</TableRow>
+							))}
+						</TableBody>
+					</Table>
+				</Paper>
+
+				<Divider sx={{ my: 2 }} />
+
+				<Typography variant="h6" align="right">
 					Total: {formatMoney(total, "₱")}
-				</h3>
-				<p style={{ textAlign: "center" }}>Thank you for your purchase!</p>
-			</div>
+				</Typography>
+
+				<Typography variant="body2" align="center" sx={{ mt: 3 }}>
+					Thank you for your purchase!
+				</Typography>
+			</Box>
 		);
 	}
 );
@@ -69,7 +97,13 @@ type WrapperProps = ReceiptProps & {
 	onClose: () => void;
 };
 
-const ReceiptWrapper: React.FC<WrapperProps> = ({ customer, carts, total, date, onClose }) => {
+const ReceiptWrapper: React.FC<WrapperProps> = ({
+	customer,
+	carts,
+	total,
+	date,
+	onClose,
+}) => {
 	const receiptRef = useRef<HTMLDivElement | null>(null);
 
 	const handlePrint = useReactToPrint({
@@ -78,44 +112,47 @@ const ReceiptWrapper: React.FC<WrapperProps> = ({ customer, carts, total, date, 
 	});
 
 	return (
-		<div
-			style={{
-				position: "fixed",
-				top: 0,
-				left: 0,
-				width: "100%",
-				height: "100%",
-				background: "rgba(0,0,0,0.5)",
-				display: "flex",
-				justifyContent: "center",
-				alignItems: "center",
-				zIndex: 9999,
+		<Dialog
+			open
+			onClose={onClose}
+			maxWidth="xs"
+			fullWidth
+			PaperProps={{
+				sx: {
+					borderRadius: 3,
+					p: 1,
+				},
 			}}
 		>
-			<div
-				style={{
-					background: "white",
-					padding: 24,
-					borderRadius: 12,
-					maxWidth: 400,
-					width: "90%",
-					display: "flex",
-					flexDirection: "column",
-					gap: 16,
-				}}
-			>
-				<Receipt ref={receiptRef} customer={customer} carts={carts} total={total} date={date} />
+			<DialogContent dividers>
+				<Receipt
+					ref={receiptRef}
+					customer={customer}
+					carts={carts}
+					total={total}
+					date={date}
+				/>
+			</DialogContent>
 
-				<div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
-					<AnimationButton onClick={handlePrint} style={{ flex: 1 }}>
-						Print
-					</AnimationButton>
-					<AnimationButton onClick={onClose} style={{ flex: 1 }}>
-						Close
-					</AnimationButton>
-				</div>
-			</div>
-		</div>
+			<DialogActions sx={{ px: 3, pb: 2 }}>
+				<Button
+					onClick={handlePrint}
+					variant="contained"
+					color="primary"
+					fullWidth
+				>
+					Print
+				</Button>
+				<Button
+					onClick={onClose}
+					variant="outlined"
+					color="secondary"
+					fullWidth
+				>
+					Close
+				</Button>
+			</DialogActions>
+		</Dialog>
 	);
 };
 

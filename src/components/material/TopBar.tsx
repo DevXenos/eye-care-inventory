@@ -1,12 +1,12 @@
+// components/navigation/TopBar.tsx
 import * as React from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
 	LucideBell,
 	LucideBellDot,
 	LucideSearch,
 	LucideX,
 } from "lucide-react";
-import AnimationButton from "../material/AnimationButton";
 import { AnimatePresence, motion } from "framer-motion";
 import Colors from "../../constants/Colors";
 import useProducts from "../../hooks/useProducts";
@@ -15,7 +15,15 @@ import { toast } from "sonner";
 import useNotifications from "../../hooks/useNotifications";
 import Swal from "sweetalert2";
 import { useQuery } from "../../context/QueryProvider";
-import { Box, Button, Typography, IconButton } from "@mui/material";
+import {
+	Box,
+	Button,
+	Typography,
+	IconButton,
+	InputBase,
+	Divider,
+	Paper,
+} from "@mui/material";
 
 interface TopBarProps {
 	onQuery?: (query: string) => void;
@@ -37,17 +45,21 @@ const hideQueryOn: string[] = [
 const TopBar: React.FC<TopBarProps> = ({ onQuery = () => { } }) => {
 	const { query, setQuery } = useQuery();
 	const location = useLocation();
+	const navigate = useNavigate();
 	const menuRef = React.useRef<HTMLDivElement>(null);
 	const [isNotifOpen, setNotifOpen] = React.useState(false);
 
 	const [reachMinimumLimit, setReachMinimumLimit] =
 		React.useState<ProductType | null>(null);
-	const threshold = 2000;
+	const threshold = 50;
 
 	const { products } = useProducts();
 	const { notifications, unreadNotif, updateNotification, removeNotification } =
 		useNotifications();
 
+	// ----------------------
+	// Handle Click Outside of Notification Menu
+	// ----------------------
 	React.useEffect(() => {
 		if (!isNotifOpen) return;
 		const handleClickOutside = (e: MouseEvent) => {
@@ -59,6 +71,9 @@ const TopBar: React.FC<TopBarProps> = ({ onQuery = () => { } }) => {
 		return () => document.removeEventListener("mousedown", handleClickOutside);
 	}, [isNotifOpen]);
 
+	// ----------------------
+	// Detect Low Stock
+	// ----------------------
 	React.useEffect(() => {
 		if (!products || products.length === 0) {
 			setReachMinimumLimit(null);
@@ -75,6 +90,9 @@ const TopBar: React.FC<TopBarProps> = ({ onQuery = () => { } }) => {
 		setReachMinimumLimit(lowestProduct);
 	}, [products, threshold]);
 
+	// ----------------------
+	// Low Stock Warning Toast
+	// ----------------------
 	React.useEffect(() => {
 		const lastShown = localStorage.getItem("notification-last-show");
 		const now = new Date();
@@ -97,6 +115,9 @@ const TopBar: React.FC<TopBarProps> = ({ onQuery = () => { } }) => {
 		}
 	}, [reachMinimumLimit]);
 
+	// ----------------------
+	// Search Query Logic
+	// ----------------------
 	const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.currentTarget.value.trim();
 		onQuery(value);
@@ -109,43 +130,32 @@ const TopBar: React.FC<TopBarProps> = ({ onQuery = () => { } }) => {
 	};
 
 	const getTitle = () => {
-		const path = location.pathname.replace("/dashboard", "").trim();
-		switch (path) {
-			case "/":
-				return "Dashboard";
-			case "/category":
-				return "Category";
-			case "/inventory":
-				return "Inventory";
-			case "/create-product":
-				return "Create Product";
-			case "/edit-product":
-				return "Edit Product";
-			case "/generate-barcode":
-				return "Generate Barcode";
-			case "/purchase":
-				return "Purchase";
-			case "/create-purchase":
-				return "Create Purchase";
-			case "/edit-purchase":
-				return "Edit Purchase";
-			case "/stock-history":
-				return "Stock History";
-			case "/suppliers":
-				return "Suppliers";
-			case "/notifications":
-				return "Notifications";
-			case "/settings":
-				return "Account Settings";
-			case "/pos":
-				return "POS";
-			case "/sales-report":
-				return "Sales Report";
-			default:
-				return path;
-		}
+		const path = location.pathname.replace("/dashboard", "").trim() || "/";
+
+		const paths: Record<string, string> = {
+			"/": "Dashboard",
+			"/category": "Category",
+			"/inventory": "Inventory",
+			"/create-product": "Create Product",
+			"/edit-product": "Edit Product",
+			"/generate-barcode": "Generate Barcode",
+			"/purchase": "Purchase",
+			"/create-purchase": "Create Purchase",
+			"/edit-purchase": "Edit Purchase",
+			"/stock-history": "Stock History",
+			"/suppliers": "Suppliers",
+			"/notifications": "Notifications",
+			"/settings": "Account Settings",
+			"/pos": "POS",
+			"/sales-report": "Sales Report",
+		};
+
+		return paths[path] ?? "Dashboard";
 	};
 
+	// ----------------------
+	// Mark notifications as read when opened
+	// ----------------------
 	React.useEffect(() => {
 		if (isNotifOpen) {
 			notifications.forEach((notif) => {
@@ -156,65 +166,101 @@ const TopBar: React.FC<TopBarProps> = ({ onQuery = () => { } }) => {
 	}, [isNotifOpen, notifications, updateNotification]);
 
 	return (
-		<Box sx={{ bgColor: "red", width: "100%", display: "flex", alignItems: "center", gap: 2, py: 1, px: 2 }}>
+		<Box
+			sx={{
+				display: "flex",
+				alignItems: "center",
+				gap: 2,
+				py: 1,
+				px: 2,
+				borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
+				bgcolor: "background.paper",
+				position: "sticky",
+				top: "1rem",
+				mx: "1rem",
+				mb: "1rem",
+				zIndex: 10,
+				borderRadius: 1
+			}}
+		>
 			<Typography variant="h6" fontWeight={700}>
 				{getTitle()}
 			</Typography>
 
-			<Box sx={{ display: "flex", gap: 2, alignItems: "center", flex: 1, justifyContent: "flex-end" }}>
-				
+			<Box
+				sx={{
+					display: "flex",
+					gap: 2,
+					alignItems: "center",
+					flex: 1,
+					justifyContent: "flex-end",
+				}}
+			>
+				{/* Search Bar */}
 				{!hideQueryOn.includes(location.pathname) && (
 					<Box
-						sx={{
+						sx={(theme) => ({
 							display: "flex",
-							flexDirection: "row",
 							alignItems: "center",
 							gap: 1,
 							flex: 1,
 							maxWidth: 400,
 							borderRadius: 999,
 							px: 2,
-							py: 1,
-						}}
+							py: 0.5,
+							border: `1px solid ${theme.palette.primary.main}`,
+							bgcolor: "background.default",
+						})}
 					>
 						<LucideSearch size={20} />
-						<input
+						<InputBase
 							value={query}
 							onChange={onChange}
 							placeholder="Search..."
-							style={{
-								flex: 1,
-								border: "none",
-								outline: "none",
-								background: "transparent",
-								fontSize: "0.9rem",
-							}}
+							sx={{ flex: 1 }}
 						/>
-						<IconButton size="small" onClick={onClearQuery}>
-							<LucideX size={18} />
-						</IconButton>
+						{query && (
+							<IconButton size="small" onClick={onClearQuery}>
+								<LucideX size={18} />
+							</IconButton>
+						)}
 					</Box>
 				)}
 
+				{/* POS Button */}
 				{location.pathname !== "/dashboard/pos" && (
-					<AnimationButton to="/dashboard/pos" style={{ width: 120, borderRadius: 999 }}>
+					<Button
+						onClick={() => navigate("/dashboard/pos")}
+						variant="contained"
+						sx={{
+							borderRadius: 999,
+							minWidth: 120,
+							textTransform: "none",
+							fontWeight: 600,
+						}}
+					>
 						POS
-					</AnimationButton>
+					</Button>
 				)}
 
-				<Button
-					variant="outlined"
-					sx={{ borderRadius: 999, aspectRatio: "1 / 1" }}
+				{/* Notification Button */}
+				<IconButton
+					color="primary"
 					onClick={() => setNotifOpen(!isNotifOpen)}
+					sx={{
+						borderRadius: 999,
+						width: 44,
+						height: 44,
+						border: (theme) => `1px solid ${theme.palette.primary.main}`,
+					}}
 				>
-					{unreadNotif ? (
-						<LucideBellDot size={24} />
-					) : (
-						<LucideBell size={24} />
-					)}
-				</Button>
+					{unreadNotif ? <LucideBellDot size={22} /> : <LucideBell size={22} />}
+				</IconButton>
 			</Box>
 
+			{/* ---------------------- */}
+			{/* Notifications Drawer */}
+			{/* ---------------------- */}
 			<AnimatePresence>
 				{isNotifOpen && (
 					<motion.div
@@ -227,68 +273,71 @@ const TopBar: React.FC<TopBarProps> = ({ onQuery = () => { } }) => {
 							inset: 0,
 							zIndex: 999,
 							display: "flex",
-							flexDirection: "row",
 						}}
 					>
-						<Box sx={{ flex: 1 }} onClick={() => setNotifOpen(false)} />
+						<Box flex={1} onClick={() => setNotifOpen(false)} />
 
-						<Box
+						<Paper
 							ref={menuRef}
+							elevation={8}
 							sx={{
 								width: "100%",
 								maxWidth: 420,
 								height: "100%",
-								bgcolor: "rgba(255,255,255,0.85)",
-								backdropFilter: "blur(12px)",
-								boxShadow: "0 8px 24px rgba(0,0,0,0.2)",
+								bgcolor: "background.paper",
+								backdropFilter: "blur(10px)",
 								display: "flex",
 								flexDirection: "column",
+								p: 2,
 								borderTopLeftRadius: 2,
 								borderBottomLeftRadius: 2,
 								overflowY: "auto",
-								p: 2,
 							}}
 						>
 							<Typography
 								variant="subtitle1"
 								fontWeight={700}
-								sx={{ mb: 2, color: Colors.primary }}
+								sx={{ mb: 2, color: "primary.main" }}
 							>
 								Notifications
 							</Typography>
 
-							<Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-								{notifications
+							{notifications.length === 0 ? (
+								<Typography align="center" sx={{ color: "text.secondary" }}>
+									No notifications
+								</Typography>
+							) : (
+								notifications
 									.slice()
 									.sort((a, b) => b.date - a.date)
 									.map((notif) => (
 										<Box
 											key={notif.id}
 											sx={{
-												p: 2,
-												display: "flex",
-												flexDirection: "column",
-												gap: 0.5,
-												borderBottom: "1px solid rgba(0,0,0,0.25)",
+												p: 1.5,
+												borderBottom: "1px solid rgba(0,0,0,0.12)",
 												bgcolor: notif.isRead
 													? "transparent"
-													: "rgba(99,102,241,0.1)",
+													: "action.hover",
 												borderLeft: notif.isRead
 													? "none"
-													: `4px solid ${Colors.primary}`,
+													: (theme) => `4px solid ${theme.palette.primary.main}`,
+												borderRadius: 1,
+												transition: "background 0.2s",
 											}}
 										>
 											<Box
 												sx={{
 													display: "flex",
-													justifyContent: "space-between",
 													alignItems: "center",
+													justifyContent: "space-between",
+													mb: 0.5,
 												}}
 											>
 												<Typography
 													variant="body1"
 													fontWeight={600}
-													color={Colors.primary}
+													color="primary"
 												>
 													{notif.title}
 												</Typography>
@@ -296,39 +345,36 @@ const TopBar: React.FC<TopBarProps> = ({ onQuery = () => { } }) => {
 													size="small"
 													onClick={() => {
 														Swal.fire({
-															title: `Do you want to delete this notification?`,
+															title: `Delete this notification?`,
+															icon: "warning",
 															showDenyButton: true,
 															confirmButtonText: "Delete",
-															denyButtonText: `Cancel`,
-															buttonsStyling: true,
-															icon: "warning",
+															denyButtonText: "Cancel",
 														}).then((result) => {
-															if (result.isConfirmed) {
-																notif.id && removeNotification(notif.id);
-																Swal.fire("Deleted Successfully!", "", "success");
+															if (result.isConfirmed && notif.id) {
+																removeNotification(notif.id);
+																Swal.fire("Deleted!", "", "success");
 															}
 														});
 													}}
 												>
-													<LucideX size={20} />
+													<LucideX size={18} />
 												</IconButton>
 											</Box>
-
-											<Typography variant="body2">{notif.message}</Typography>
-											<Typography variant="caption" color="text.secondary" align="right">
+											<Typography variant="body2">
+												{notif.message}
+											</Typography>
+											<Typography
+												variant="caption"
+												color="text.secondary"
+												sx={{ display: "block", textAlign: "right", mt: 0.5 }}
+											>
 												{new Date(notif.date).toLocaleString()}
 											</Typography>
 										</Box>
-									))}
-								{notifications.length === 0 && (
-									<Typography
-										sx={{ textAlign: "center", py: 2, color: "#555" }}
-									>
-										No notifications
-									</Typography>
-								)}
-							</Box>
-						</Box>
+									))
+							)}
+						</Paper>
 					</motion.div>
 				)}
 			</AnimatePresence>

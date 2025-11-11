@@ -1,6 +1,0 @@
-// _screen.scss
-@mixin small {
-	@media screen and (max-width: 1240px) {
-		@content;
-	}
-}

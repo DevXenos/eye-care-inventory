@@ -1,6 +1,7 @@
 import * as React from "react";
 import MaterialDialog from "../components/material/MaterialDialog"; // your dialog component
-import Button from "../components/material/Button";
+// import Button from "../components/material/Button";
+import { Button } from "@mui/material";
 import { AnimatePresence } from "framer-motion";
 import StyleSheet from "../utils/Stylesheet";
 
@@ -77,7 +78,7 @@ export const ConfirmDialogProvider: React.FC<{ children: React.ReactNode }> = ({
 							<p>{options.message}</p>
 
 							<div style={{ display: "flex", justifyContent: "flex-end", gap: 12, marginTop: 16 }}>
-								<Button variant="outline" onClick={handleCancel}>
+								<Button variant="outlined" onClick={handleCancel}>
 									Cancel
 								</Button>
 
@@ -88,7 +89,7 @@ export const ConfirmDialogProvider: React.FC<{ children: React.ReactNode }> = ({
 								)}
 
 								{options.onDanger && (
-									<Button autoFocus variant="danger" onClick={handleDanger}>
+									<Button autoFocus variant="outlined" onClick={handleDanger}>
 										{options.dangerText || "Danger"}
 									</Button>
 								)}

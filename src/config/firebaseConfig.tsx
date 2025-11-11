@@ -24,7 +24,9 @@ const database = getDatabase(app);
 // 	);
 // })() as Database;
 
-if (window.location.host.includes("localhost")) {
+const useEmulator = process.env.REACT_APP_USE_EMULATOR === 'true';
+
+if (useEmulator) {
 	connectAuthEmulator(auth, 'http://localhost:8001', {disableWarnings: true});
 	connectFirestoreEmulator(firestore, 'localhost', 8002);
 	connectDatabaseEmulator(database, 'localhost', 8003);

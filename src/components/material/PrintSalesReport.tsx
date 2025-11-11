@@ -2,7 +2,18 @@
 import * as React from "react";
 import { useRef } from "react";
 import { useReactToPrint } from "react-to-print";
-import AnimationButton from "../material/AnimationButton";
+import {
+	Box,
+	Button,
+	Typography,
+	Table,
+	TableHead,
+	TableBody,
+	TableRow,
+	TableCell,
+	Divider,
+	Paper,
+} from "@mui/material";
 import formatMoney from "../../utils/formatMoney";
 import formatDate from "../../utils/formatDate";
 import { SalesType } from "../../types/SalesType";
@@ -21,52 +32,49 @@ const SalesReportPrint = React.forwardRef<HTMLDivElement, PrintSalesReportProps>
 		const totalAmount = filteredSales.reduce((sum, s) => sum + s.amount, 0);
 
 		return (
-			<div ref={ref} style={{ padding: 40, fontFamily: "monospace" }}>
-				<h1 style={{ textAlign: "center", marginBottom: 20 }}>📊 Sales Report</h1>
-				<p style={{ textAlign: "center", fontSize: 16 }}>
+			<Box ref={ref} p={5} fontFamily="monospace">
+				<Typography variant="h4" align="center" gutterBottom>
+					📊 Sales Report
+				</Typography>
+				<Typography variant="subtitle1" align="center" gutterBottom>
 					Date Range: {startDate} → {endDate}
-				</p>
-				<hr style={{ margin: "20px 0" }} />
+				</Typography>
 
-				<table
-					style={{
-						width: "100%",
-						borderCollapse: "collapse",
-						fontSize: 15,
-					}}
-				>
-					<thead>
-						<tr>
-							<th align="left" style={{ borderBottom: "1px solid #ddd", padding: 8 }}>
-								Date
-							</th>
-							<th align="left" style={{ borderBottom: "1px solid #ddd", padding: 8 }}>
-								Customer
-							</th>
-							<th align="right" style={{ borderBottom: "1px solid #ddd", padding: 8 }}>
-								Amount
-							</th>
-						</tr>
-					</thead>
-					<tbody>
-						{filteredSales.map((sale, i) => (
-							<tr key={i}>
-								<td style={{ padding: 8 }}>{formatDate(sale.date)}</td>
-								<td style={{ padding: 8 }}>{sale.customer}</td>
-								<td align="right" style={{ padding: 8 }}>
-									{formatMoney(sale.amount, "₱")}
-								</td>
-							</tr>
-						))}
-					</tbody>
-				</table>
+				<Divider sx={{ my: 3 }} />
 
-				<hr style={{ marginTop: 20 }} />
-				<h2 style={{ textAlign: "right" }}>
+				<Paper variant="outlined">
+					<Table size="small">
+						<TableHead>
+							<TableRow>
+								<TableCell>Date</TableCell>
+								<TableCell>Customer</TableCell>
+								<TableCell align="right">Amount</TableCell>
+							</TableRow>
+						</TableHead>
+						<TableBody>
+							{filteredSales.map((sale, i) => (
+								<TableRow key={i}>
+									<TableCell>{formatDate(sale.date)}</TableCell>
+									<TableCell>{sale.customer}</TableCell>
+									<TableCell align="right">
+										{formatMoney(sale.amount, "₱")}
+									</TableCell>
+								</TableRow>
+							))}
+						</TableBody>
+					</Table>
+				</Paper>
+
+				<Divider sx={{ my: 3 }} />
+
+				<Typography variant="h6" align="right">
 					Total: {formatMoney(totalAmount, "₱")}
-				</h2>
-				<p style={{ textAlign: "center", marginTop: 40 }}>End of report.</p>
-			</div>
+				</Typography>
+
+				<Typography variant="body2" align="center" sx={{ mt: 4 }}>
+					End of report.
+				</Typography>
+			</Box>
 		);
 	}
 );
@@ -88,51 +96,61 @@ const PrintSalesReportWrapper: React.FC<WrapperProps> = ({
 
 	const handlePrint = useReactToPrint({
 		contentRef: printRef,
-		documentTitle: `SalesReport_${ startDate }_${ endDate } `,
+		documentTitle: `SalesReport_${startDate}_${endDate}`,
 	});
 
 	return (
-		<div
-			style={{
+		<Box
+			sx={{
 				position: "fixed",
 				top: 0,
 				left: 0,
 				width: "100%",
 				height: "100%",
-				background: "white",
+				bgcolor: "background.paper",
 				display: "flex",
 				flexDirection: "column",
-				padding: 24,
+				p: 3,
 				boxSizing: "border-box",
 				overflowY: "auto",
 				zIndex: 9999,
 			}}
 		>
-			<div style={{ flex: 1, overflowY: "auto" }}>
+			<Box sx={{ flex: 1, overflowY: "auto" }}>
 				<SalesReportPrint
 					ref={printRef}
 					filteredSales={filteredSales}
 					startDate={startDate}
 					endDate={endDate}
 				/>
-			</div>
+			</Box>
 
-			<div
-				style={{
+			<Box
+				sx={{
 					display: "flex",
 					justifyContent: "flex-end",
-					gap: 12,
-					marginTop: 24,
+					gap: 2,
+					mt: 3,
 				}}
 			>
-				<AnimationButton onClick={handlePrint} style={{ flex: 0.2, minWidth: 120 }}>
+				<Button
+					variant="contained"
+					color="primary"
+					onClick={handlePrint}
+					sx={{ minWidth: 120 }}
+				>
 					Print
-				</AnimationButton>
-				<AnimationButton onClick={onClose} style={{ flex: 0.2, minWidth: 120 }}>
+				</Button>
+				<Button
+					variant="outlined"
+					color="secondary"
+					onClick={onClose}
+					sx={{ minWidth: 120 }}
+				>
 					Close
-				</AnimationButton>
-			</div>
-		</div>
+				</Button>
+			</Box>
+		</Box>
 	);
 };
 

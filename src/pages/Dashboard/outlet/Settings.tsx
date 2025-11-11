@@ -1,6 +1,6 @@
-import { LucideCamera, LucideShieldCheck, LucideUserCog } from "lucide-react";
+import { LucideShieldCheck, LucideUserCog } from "lucide-react";
 import * as React from "react";
-import { Box, Button, Card, Avatar, Typography, TextField, Stack } from "@mui/material";
+import { Box, Button, Card, Avatar, Typography, Stack } from "@mui/material";
 import { AnimatePresence } from "framer-motion";
 import MaterialDialog from "../../../components/material/MaterialDialog";
 import PasswordForm, { PasswordFormData } from "../../../components/Form/PasswordForm";
@@ -13,7 +13,6 @@ import { auth } from "../../../config/firebaseConfig";
 const Settings: React.FC = () => {
 	const [showChangePassForm, setShowChangePassForm] = React.useState(false);
 	const [showEditProfile, setShowEditProfile] = React.useState(false);
-	const [threshold, setThreshold] = React.useState<number>(10);
 
 	const { isLoading: isCurrentUserLoading, currentUser, changePassword, updateProfileInfo } =
 		useCurrentUser();
@@ -56,20 +55,6 @@ const Settings: React.FC = () => {
 						alt="User Avatar"
 						sx={{ width: 120, height: 120 }}
 					/>
-					<Box
-						position="absolute"
-						bottom={0}
-						right={0}
-						sx={{
-							backgroundColor: "background.paper",
-							borderRadius: "50%",
-							p: 0.5,
-							boxShadow: 1,
-							cursor: "pointer",
-						}}
-					>
-						<LucideCamera size={18} />
-					</Box>
 				</Box>
 				<Typography variant="h5" fontWeight={600}>
 					{currentUser?.displayName || "Name"}
@@ -104,32 +89,8 @@ const Settings: React.FC = () => {
 					>
 						Change Password
 					</Button>
-					{/* <Button
-						variant="outlined"
-						color="error"
-						startIcon={<LucideTrash2 />}
-						fullWidth
-					>
-						Delete Account
-					</Button> */}
 				</Stack>
 			</Card>
-
-			{/* Preferences */}
-			{/* <Card sx={{ p: 3, borderRadius: 3, boxShadow: 3 }}>
-				<Typography variant="subtitle1" fontWeight={600} mb={2}>
-					Preferences
-				</Typography>
-				<Box display="flex" flexDirection="column" gap={2}>
-					<TextField
-						label="Stock Threshold Alert"
-						type="number"
-						value={threshold}
-						onChange={(e) => setThreshold(Number(e.target.value))}
-						helperText="You'll receive a notification when stock reaches this level."
-					/>
-				</Box>
-			</Card> */}
 
 			<Button
 				variant="contained"

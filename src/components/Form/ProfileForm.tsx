@@ -1,7 +1,6 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
-import { toast } from "sonner";
-import Button from "../material/Button";
+import { Box, Typography, TextField, Avatar, Button } from "@mui/material";
 
 export type ProfileFormData = {
 	name: string | null;
@@ -48,44 +47,67 @@ const ProfileForm: React.FC<Props> = ({ profile, onSubmit }) => {
 	};
 
 	return (
-		<div style={{ display: "flex", flexDirection: "column", gap: 16, padding: 20 }}>
-			<h2>Update Profile</h2>
+		<Box
+			display="flex"
+			flexDirection="column"
+			gap={3}
+			p={3}
+			alignItems="center"
+		>
+			<Typography variant="h5">Update Profile</Typography>
 
-			<div style={{ display: "flex", flexDirection: "column", gap: 8, justifyContent: "center", alignItems: "center" }}>
+			{/* Profile Picture */}
+			<Box
+				onClick={handlePreviewClick}
+				sx={{
+					width: 150,
+					height: 150,
+					borderRadius: "50%",
+					cursor: "pointer",
+					overflow: "hidden",
+					display: "flex",
+					justifyContent: "center",
+					alignItems: "center",
+					backgroundColor: preview ? "transparent" : "#eee",
+					"&:hover": {
+						opacity: 0.8,
+					},
+				}}
+			>
 				{preview ? (
-					<img
+					<Avatar
 						src={preview}
 						alt="Profile"
-						style={{ width: 150, height: 150, borderRadius: "50%", objectFit: "cover", cursor: "pointer" }}
-						onClick={handlePreviewClick}
-						title="Click to change profile"
+						sx={{ width: 150, height: 150 }}
 					/>
 				) : (
-					<p style={{ color: "#999" }}>No profile picture</p>
+					<Typography color="text.secondary" variant="body2" textAlign="center">
+						Click to upload profile
+					</Typography>
 				)}
-			</div>
+			</Box>
 
-			<div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-				<label>Name</label>
-				<input
-					type="text"
-					value={displayName}
-					onChange={(e) => setDisplayName(e.target.value)}
-					placeholder="Enter your name"
-					aria-label="name"
-					style={{ padding: 8, borderRadius: 6, border: "1px solid #ccc" }}
-				/>
-			</div>
+			{/* Name Input */}
+			<TextField
+				label="Name"
+				value={displayName}
+				onChange={(e) => setDisplayName(e.target.value)}
+				fullWidth
+			/>
 
 			<Button
-				onClick={() => onSubmit?.({
-					name: displayName,
-					profile: preview
-				})}
+				variant="contained"
+				color="primary"
+				onClick={() =>
+					onSubmit?.({
+						name: displayName,
+						profile: preview,
+					})
+				}
 			>
 				Save Changes
 			</Button>
-		</div>
+		</Box>
 	);
 };
 

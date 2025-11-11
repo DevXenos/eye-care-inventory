@@ -1,7 +1,7 @@
 import * as React from "react";
 import { PurchaseType } from "../../types/PurchaseType";
 import StyleSheet from "../../utils/Stylesheet";
-import Button from "../material/Button";
+import { Button } from "@mui/material";
 
 type Props = {
 	purchase: PurchaseType;
@@ -48,7 +48,7 @@ const PurchaseView: React.FC<Props> = ({ purchase, onClose, onEdit, onArchive })
 			{/* Actions */}
 			<div style={styles.actions}>
 				<Button onClick={() => onEdit?.(purchase)} style={styles.action}>Edit</Button>
-				<Button onClick={() => onArchive?.(purchase)} variant={purchase.archived ? "primary" : "danger"} style={styles.action}>
+				<Button onClick={() => onArchive?.(purchase)} variant={purchase.archived ? "contained" : "outlined"} style={styles.action}>
 					{purchase.archived ? "Unarchive" :"Archive"}
 				</Button>
 			</div>

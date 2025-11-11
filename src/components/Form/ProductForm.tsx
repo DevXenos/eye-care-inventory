@@ -1,7 +1,8 @@
 import * as React from "react";
+import { Button } from "@mui/material";
 import { ProductType } from "../../types/ProductType";
 import StyleSheet from "../../utils/Stylesheet";
-import Button from "../material/Button";
+// import Button from "../material/Button";
 
 type ProductFormProps = {
 	product?: ProductType | null; // edit mode if passed
@@ -191,7 +192,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSave, onCancel }) 
 			<div style={styles.actions}>
 				<Button type="submit">{product ? "Update Product" : "Add Product"}</Button>
 				{onCancel && (
-					<Button type="button" variant="outline" onClick={onCancel}>
+					<Button type="button" variant="outlined" onClick={onCancel}>
 						Cancel
 					</Button>
 				)}

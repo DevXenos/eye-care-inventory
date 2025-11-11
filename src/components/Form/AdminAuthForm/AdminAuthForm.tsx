@@ -188,8 +188,6 @@ const AdminAuthForm: React.FC = () => {
 								color: "#fff",
 								backgroundColor: "rgba(255,255,255,0.05)",
 								borderRadius: 2,
-								"& fieldset": { border: "1px solid rgba(255,255,255,0.2)" },
-								"&:hover fieldset": { borderColor: "#00f0ff" },
 								"&.Mui-focused fieldset": {
 									borderColor: Colors.primary,
 									boxShadow: `0 0 15px ${Colors.primary}55`,
@@ -211,20 +209,19 @@ const AdminAuthForm: React.FC = () => {
 						fontWeight: 700,
 						fontSize: "1.05rem",
 						py: 1.4,
-						background: `linear-gradient(90deg, ${Colors.primary}, #00f0ff)`,
-						boxShadow: `0 0 20px ${Colors.primary}`,
 						transition: "all 0.35s ease",
 						letterSpacing: "0.5px",
-						"&:hover": {
-							background: `linear-gradient(90deg, #00f0ff, ${Colors.primary})`,
-							boxShadow: `0 0 35px #00f0ffaa`,
-							transform: "translateY(-3px)",
-						},
 					}}
 				>
 					Log In
 				</Button>
 			</Paper>
+
+			{process.env.REACT_APP_USE_EMULATOR==='true' && (
+				<Box sx={{ color: "white", position: "fixed", bottom: 0 }}>
+					Emulator
+				</Box>
+			)}
 		</Box>
 	);
 };

@@ -1,7 +1,8 @@
 import * as React from "react";
 import { SupplierType } from "../../types/SupplierType";
 import StyleSheet from "../../utils/Stylesheet";
-import Button from "../material/Button";
+// import Button from "../material/Button";
+import { Button } from "@mui/material";
 
 type Props = {
 	supplier: SupplierType;
@@ -45,7 +46,7 @@ const SupplierView: React.FC<Props> = ({ supplier, onClose, onArchive, onEdit })
 				{/* Actions */}
 				<div style={styles.actions}>
 					<Button onClick={() => onEdit(supplier)} style={styles.action}>Edit</Button>
-					<Button onClick={() => onArchive(supplier)} variant={supplier.archived ? "primary" : "danger"} style={styles.action}>
+					<Button onClick={() => onArchive(supplier)} variant={supplier.archived ? "contained" : "outlined"} style={styles.action}>
 						{supplier.archived ? "Unarchive" : "Archive"}
 					</Button>
 				</div>
