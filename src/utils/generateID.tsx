@@ -21,4 +21,3 @@ const generateID = (
 };
 
 export default generateID;
-  
