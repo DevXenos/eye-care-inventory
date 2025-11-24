@@ -1,5 +1,5 @@
 import * as React from "react";
-import { BrowserRouter, HashRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import DashboardPanel from "./pages/Dashboard/DashboardPanel";
 import Dashboard from "./pages/Dashboard/outlet/Dashboard";
 import Inventory from "./pages/Dashboard/outlet/Inventory";
@@ -23,67 +23,54 @@ import { User } from "firebase/auth";
 
 type Props = {
 	currentUser: User | null;
-}
+};
 
 const Links: React.FC<Props> = ({ currentUser }) => {
 	return (
 		<QueryProvider>
 			<Routes>
 				<Route index element={<AdminAuthForm />} />
-				<Route path='/dashboard' element={currentUser ? <DashboardPanel /> : <NoAccess />}>
+				<Route
+					path="/dashboard"
+					element={currentUser ? <DashboardPanel /> : <NoAccess />}
+				>
 					<Route index element={<Dashboard />} />
-
-					<Route path='generate-barcode' element={<GenerateBarCode />} />
+					<Route path="generate-barcode" element={<GenerateBarCode />} />
 
 					{currentUser && (
 						<>
-							<Route path='notifications' element={<Notifications />} />
-							<Route path='inventory' element={<Inventory />} />
-							<Route path='stock-history' element={<StockHistory />} />
-							<Route path='suppliers' element={<Suppliers />} />
+							<Route path="notifications" element={<Notifications />} />
+							<Route path="inventory" element={<Inventory />} />
+							<Route path="stock-history" element={<StockHistory />} />
+							<Route path="suppliers" element={<Suppliers />} />
 							<Route path="sales-report" element={<SalesReport />} />
 							<Route path="purchase" element={<Purchase />} />
-							<Route path='pos' element={<POS />} />
-							<Route path='settings' element={<Settings />} />
+							<Route path="pos" element={<POS />} />
+							<Route path="settings" element={<Settings />} />
 						</>
 					)}
 				</Route>
-
-				{/* <Route path="*" element={<NoAccess />} /> */}
 			</Routes>
 		</QueryProvider>
-	)
-}
+	);
+};
 
 const App: React.FC = () => {
 	const { isLoading, currentUser } = useCurrentUser();
 
-	const isEmulator = process.env.REACT_APP_USE_EMULATOR === 'true';
-
 	if (isLoading) {
-		return (
-			<LoadingPage />
-		);
+		return <LoadingPage />;
 	}
-
-	const links = <Links currentUser={currentUser} />;
 
 	return (
 		<ThemeProvider theme={theme}>
-
 			<CssBaseline />
 
-			{isEmulator ? (
-				<BrowserRouter>
-					{links}
-				</BrowserRouter>
-			) : (
-				<HashRouter>
-					{links}
-				</HashRouter>
-			)}
+			<BrowserRouter>
+				<Links currentUser={currentUser} />
+			</BrowserRouter>
 		</ThemeProvider>
 	);
-}
+};
 
 export default App;
