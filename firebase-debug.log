@@ -1,0 +1,103 @@
+[debug] [2025-11-24T01:13:15.562Z] ----------------------------------------------------------------------
+[debug] [2025-11-24T01:13:15.571Z] Command:       C:\Users\library\node.exe C:\Users\dell\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js emulators:start --import=./emulator-data --export-on-exit
+[debug] [2025-11-24T01:13:15.572Z] CLI Version:   14.4.0
+[debug] [2025-11-24T01:13:15.573Z] Platform:      win32
+[debug] [2025-11-24T01:13:15.574Z] Node Version:  v20.16.0
+[debug] [2025-11-24T01:13:15.574Z] Time:          Mon Nov 24 2025 09:13:15 GMT+0800 (China Standard Time)
+[debug] [2025-11-24T01:13:15.575Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-11-24T01:13:16.786Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-11-24T01:13:16.787Z] > authorizing via signed-in user (justinegonzales1219@gmail.com)
+[debug] [2025-11-24T01:13:17.398Z] openjdk version "21.0.7" 2025-04-15 LTS
+
+[debug] [2025-11-24T01:13:17.400Z] OpenJDK Runtime Environment Temurin-21.0.7+6 (build 21.0.7+6-LTS)
+OpenJDK 64-Bit Server VM Temurin-21.0.7+6 (build 21.0.7+6-LTS, mixed mode, sharing)
+
+[debug] [2025-11-24T01:13:17.469Z] Parsed Java major version: 21
+[info] i  emulators: Starting emulators: auth, firestore, database {"metadata":{"emulator":{"name":"hub"},"message":"Starting emulators: auth, firestore, database"}}
+[debug] [2025-11-24T01:13:17.519Z] [logging] Logging Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-11-24T01:13:17.520Z] [auth] Authentication Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-11-24T01:13:17.520Z] [firestore] Firestore Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-11-24T01:13:17.521Z] [firestore.websocket] websocket server for firestore only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-11-24T01:13:17.521Z] [database] Database Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-11-24T01:13:17.522Z] assigned listening specs for emulators {"user":{"hub":[{"address":"127.0.0.1","family":"IPv4","port":4400},{"address":"::1","family":"IPv6","port":4400}],"ui":[{"address":"127.0.0.1","family":"IPv4","port":8000},{"address":"::1","family":"IPv6","port":8000}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}],"auth":[{"address":"127.0.0.1","family":"IPv4","port":8001}],"firestore":[{"address":"127.0.0.1","family":"IPv4","port":8002}],"firestore.websocket":[{"address":"127.0.0.1","family":"IPv4","port":9150}],"database":[{"address":"127.0.0.1","family":"IPv4","port":8003}]},"metadata":{"message":"assigned listening specs for emulators"}}
+[warn] !  emulators: It seems that you are running multiple instances of the emulator suite for project eye-care-dela-luna. This may result in unexpected behavior. 
+[debug] [2025-11-24T01:13:17.576Z] [hub] writing locator at C:\Users\dell\AppData\Local\Temp\hub-eye-care-dela-luna.json
+[info] i  firestore: Importing data from C:\Users\dell\Documents\ReactProject\EyeCareInventory\react-renderer\emulator-data\firestore_export\firestore_export.overall_export_metadata {"metadata":{"emulator":{"name":"firestore"},"message":"Importing data from C:\\Users\\dell\\Documents\\ReactProject\\EyeCareInventory\\react-renderer\\emulator-data\\firestore_export\\firestore_export.overall_export_metadata"}}
+[debug] [2025-11-24T01:13:17.731Z] Ignoring unsupported arg: auto_download {"metadata":{"emulator":{"name":"firestore"},"message":"Ignoring unsupported arg: auto_download"}}
+[debug] [2025-11-24T01:13:17.731Z] Ignoring unsupported arg: single_project_mode_error {"metadata":{"emulator":{"name":"firestore"},"message":"Ignoring unsupported arg: single_project_mode_error"}}
+[debug] [2025-11-24T01:13:17.733Z] Starting Firestore Emulator with command {"binary":"java","args":["-Dgoogle.cloud_firestore.debug_log_level=FINE","-Duser.language=en","-jar","C:\\Users\\dell\\.cache\\firebase\\emulators\\cloud-firestore-emulator-v1.19.8.jar","--host","127.0.0.1","--port",8002,"--websocket_port",9150,"--project_id","eye-care-dela-luna","--seed_from_export","C:\\Users\\dell\\Documents\\ReactProject\\EyeCareInventory\\react-renderer\\emulator-data\\firestore_export\\firestore_export.overall_export_metadata","--rules","C:\\Users\\dell\\Documents\\ReactProject\\EyeCareInventory\\react-renderer\\firestore.rules","--single_project_mode",true],"optionalArgs":["port","webchannel_port","host","rules","websocket_port","functions_emulator","seed_from_export","project_id","single_project_mode"],"joinArgs":false,"shell":false,"port":8002} {"metadata":{"emulator":{"name":"firestore"},"message":"Starting Firestore Emulator with command {\"binary\":\"java\",\"args\":[\"-Dgoogle.cloud_firestore.debug_log_level=FINE\",\"-Duser.language=en\",\"-jar\",\"C:\\\\Users\\\\dell\\\\.cache\\\\firebase\\\\emulators\\\\cloud-firestore-emulator-v1.19.8.jar\",\"--host\",\"127.0.0.1\",\"--port\",8002,\"--websocket_port\",9150,\"--project_id\",\"eye-care-dela-luna\",\"--seed_from_export\",\"C:\\\\Users\\\\dell\\\\Documents\\\\ReactProject\\\\EyeCareInventory\\\\react-renderer\\\\emulator-data\\\\firestore_export\\\\firestore_export.overall_export_metadata\",\"--rules\",\"C:\\\\Users\\\\dell\\\\Documents\\\\ReactProject\\\\EyeCareInventory\\\\react-renderer\\\\firestore.rules\",\"--single_project_mode\",true],\"optionalArgs\":[\"port\",\"webchannel_port\",\"host\",\"rules\",\"websocket_port\",\"functions_emulator\",\"seed_from_export\",\"project_id\",\"single_project_mode\"],\"joinArgs\":false,\"shell\":false,\"port\":8002}"}}
+[info] i  firestore: Firestore Emulator logging to firestore-debug.log {"metadata":{"emulator":{"name":"firestore"},"message":"Firestore Emulator logging to \u001b[1mfirestore-debug.log\u001b[22m"}}
+[debug] [2025-11-24T01:13:25.784Z] Nov 24, 2025 9:13:25 AM com.google.cloud.datastore.emulator.firestore.websocket.WebSocketServer start
+INFO: Started WebSocket server on ws://127.0.0.1:9150
+ {"metadata":{"emulator":{"name":"firestore"},"message":"Nov 24, 2025 9:13:25 AM com.google.cloud.datastore.emulator.firestore.websocket.WebSocketServer start\r\nINFO: Started WebSocket server on ws://127.0.0.1:9150\r\n"}}
+[debug] [2025-11-24T01:13:26.044Z] API endpoint: http:// {"metadata":{"emulator":{"name":"firestore"},"message":"API endpoint: http://"}}
+[debug] [2025-11-24T01:13:26.044Z] 127.0.0.1:8002
+If you are using a library that supports the FIRESTORE_EMULATOR_HOST environment variable, run:
+
+   export FIRESTORE_EMULATOR_HOST=127.0.0.1:8002
+
+If you are running a Firestore in Datastore Mode project, run:
+
+   export DATASTORE_EMULATOR_HOST=127.0.0.1:8002
+
+Note: Support for Datastore Mode is in preview. If you encounter any bugs please file at https://github.com/firebase/firebase-tools/issues.
+Dev App Server is now running.
+
+ {"metadata":{"emulator":{"name":"firestore"},"message":"127.0.0.1:8002\nIf you are using a library that supports the FIRESTORE_EMULATOR_HOST environment variable, run:\r\n\n   export FIRESTORE_EMULATOR_HOST=127.0.0.1:8002\n\nIf you are running a Firestore in Datastore Mode project, run:\r\n\n   export DATASTORE_EMULATOR_HOST=127.0.0.1:8002\n\nNote: Support for Datastore Mode is in preview. If you encounter any bugs please file at https://github.com/firebase/firebase-tools/issues.\r\nDev App Server is now running.\n\r\n"}}
+[info] +  firestore: Firestore Emulator UI websocket is running on 9150. {"metadata":{"emulator":{"name":"firestore"},"message":"Firestore Emulator UI websocket is running on 9150."}}
+[debug] [2025-11-24T01:13:26.131Z] Checked if tokens are valid: false, expires at: 1763540516918
+[debug] [2025-11-24T01:13:26.132Z] Checked if tokens are valid: false, expires at: 1763540516918
+[debug] [2025-11-24T01:13:26.132Z] > refreshing access token with scopes: []
+[debug] [2025-11-24T01:13:26.137Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-11-24T01:13:26.138Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-11-24T01:13:27.694Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-11-24T01:13:27.694Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-11-24T01:13:27.754Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/eye-care-dela-luna [none]
+[debug] [2025-11-24T01:13:28.195Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/eye-care-dela-luna 200
+[debug] [2025-11-24T01:13:28.195Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/eye-care-dela-luna {"projectId":"eye-care-dela-luna","projectNumber":"100294651871","displayName":"Eye Care-Dela Luna","name":"projects/eye-care-dela-luna","resources":{"hostingSite":"eye-care-dela-luna","realtimeDatabaseInstance":"eye-care-dela-luna-default-rtdb"},"state":"ACTIVE","etag":"1_f49d5789-7cc5-41c1-9e89-bae72e92b427"}
+[debug] [2025-11-24T01:13:28.196Z] database rules config:  [{"instance":"eye-care-dela-luna-default-rtdb","rules":"C:\\Users\\dell\\Documents\\ReactProject\\EyeCareInventory\\react-renderer\\database.rules.json"}]
+[debug] [2025-11-24T01:13:28.204Z] Ignoring unsupported arg: projectId {"metadata":{"emulator":{"name":"database"},"message":"Ignoring unsupported arg: projectId"}}
+[debug] [2025-11-24T01:13:28.204Z] Ignoring unsupported arg: auto_download {"metadata":{"emulator":{"name":"database"},"message":"Ignoring unsupported arg: auto_download"}}
+[debug] [2025-11-24T01:13:28.204Z] Ignoring unsupported arg: rules {"metadata":{"emulator":{"name":"database"},"message":"Ignoring unsupported arg: rules"}}
+[debug] [2025-11-24T01:13:28.205Z] Starting Database Emulator with command {"binary":"java","args":["-Duser.language=en","-jar","C:\\Users\\dell\\.cache\\firebase\\emulators\\firebase-database-emulator-v4.11.2.jar","--host","127.0.0.1","--port",8003,"--single_project_mode","Warning"],"optionalArgs":["port","host","functions_emulator_port","functions_emulator_host","single_project_mode"],"joinArgs":false,"shell":false,"port":8003} {"metadata":{"emulator":{"name":"database"},"message":"Starting Database Emulator with command {\"binary\":\"java\",\"args\":[\"-Duser.language=en\",\"-jar\",\"C:\\\\Users\\\\dell\\\\.cache\\\\firebase\\\\emulators\\\\firebase-database-emulator-v4.11.2.jar\",\"--host\",\"127.0.0.1\",\"--port\",8003,\"--single_project_mode\",\"Warning\"],\"optionalArgs\":[\"port\",\"host\",\"functions_emulator_port\",\"functions_emulator_host\",\"single_project_mode\"],\"joinArgs\":false,\"shell\":false,\"port\":8003}"}}
+[info] i  database: Database Emulator logging to database-debug.log {"metadata":{"emulator":{"name":"database"},"message":"Database Emulator logging to \u001b[1mdatabase-debug.log\u001b[22m"}}
+[debug] [2025-11-24T01:13:33.082Z] 09:13:33.079 [NamespaceSystem-akka.actor.default-dispatcher-5] INFO akka.event.slf4j.Slf4jLogger - Slf4jLogger started
+ {"metadata":{"emulator":{"name":"database"},"message":"09:13:33.079 [NamespaceSystem-akka.actor.default-dispatcher-5] INFO akka.event.slf4j.Slf4jLogger - Slf4jLogger started\r\n"}}
+[debug] [2025-11-24T01:13:33.641Z] 09:13:33.641 [main] INFO com.firebase.server.forge.App$ - Listening at 127.0.0.1:8003
+ {"metadata":{"emulator":{"name":"database"},"message":"09:13:33.641 [main] INFO com.firebase.server.forge.App$ - Listening at 127.0.0.1:8003\r\n"}}
+[info] i  database: Importing data from C:\Users\dell\Documents\ReactProject\EyeCareInventory\react-renderer\emulator-data\database_export\eye-care-dela-luna-default-rtdb.json {"metadata":{"emulator":{"name":"database"},"message":"Importing data from C:\\Users\\dell\\Documents\\ReactProject\\EyeCareInventory\\react-renderer\\emulator-data\\database_export\\eye-care-dela-luna-default-rtdb.json"}}
+[debug] [2025-11-24T01:13:35.213Z] 09:13:35.213 [NamespaceSystem-akka.actor.default-dispatcher-6] INFO com.firebase.core.namespace.NamespaceActor - eye-care-dela-luna-default-rtdb successfully activated FBKV (SurveyIdle(0)) wait: 456ms, init: 0ms
+ {"metadata":{"emulator":{"name":"database"},"message":"09:13:35.213 [NamespaceSystem-akka.actor.default-dispatcher-6] INFO com.firebase.core.namespace.NamespaceActor - eye-care-dela-luna-default-rtdb successfully activated FBKV (SurveyIdle(0)) wait: 456ms, init: 0ms\r\n"}}
+[info] i  auth: Importing config from C:\Users\dell\Documents\ReactProject\EyeCareInventory\react-renderer\emulator-data\auth_export\config.json {"metadata":{"emulator":{"name":"auth"},"message":"Importing config from C:\\Users\\dell\\Documents\\ReactProject\\EyeCareInventory\\react-renderer\\emulator-data\\auth_export\\config.json"}}
+[info] i  auth: Importing accounts from C:\Users\dell\Documents\ReactProject\EyeCareInventory\react-renderer\emulator-data\auth_export\accounts.json {"metadata":{"emulator":{"name":"auth"},"message":"Importing accounts from C:\\Users\\dell\\Documents\\ReactProject\\EyeCareInventory\\react-renderer\\emulator-data\\auth_export\\accounts.json"}}
+[debug] [2025-11-24T01:13:51.044Z] >>> [apiv2][query] PUT http://127.0.0.1:8003/.settings/rules.json ns=eye-care-dela-luna-default-rtdb
+[debug] [2025-11-24T01:13:51.044Z] >>> [apiv2][body] PUT http://127.0.0.1:8003/.settings/rules.json "{\n  \"rules\": {\n    \".read\": \"true\",\n    \".write\": \"true\"\n  }\n}"
+[debug] [2025-11-24T01:13:51.108Z] 09:13:51.101 [NamespaceSystem-blocking-namespace-operation-dispatcher-8] INFO com.firebase.core.namespace.StateManager - Namespace eye-care-dela-luna-default-rtdb status Active to Active
+ {"metadata":{"emulator":{"name":"database"},"message":"09:13:51.101 [NamespaceSystem-blocking-namespace-operation-dispatcher-8] INFO com.firebase.core.namespace.StateManager - Namespace eye-care-dela-luna-default-rtdb status Active to Active\r\n"}}
+[debug] [2025-11-24T01:13:51.145Z] <<< [apiv2][status] PUT http://127.0.0.1:8003/.settings/rules.json 200
+[debug] [2025-11-24T01:13:51.146Z] <<< [apiv2][body] PUT http://127.0.0.1:8003/.settings/rules.json {"status":"ok"}
+[debug] [2025-11-24T01:13:51.152Z] Could not find VSCode notification endpoint: FetchError: request to http://localhost:40001/vscode/notify failed, reason: . If you are not running the Firebase Data Connect VSCode extension, this is expected and not an issue.
+[info] 
+┌─────────────────────────────────────────────────────────────┐
+│ ✔  All emulators ready! It is now safe to connect your app. │
+│ i  View Emulator UI at http://127.0.0.1:8000/               │
+└─────────────────────────────────────────────────────────────┘
+
+┌────────────────┬────────────────┬─────────────────────────────────┐
+│ Emulator       │ Host:Port      │ View in Emulator UI             │
+├────────────────┼────────────────┼─────────────────────────────────┤
+│ Authentication │ 127.0.0.1:8001 │ http://127.0.0.1:8000/auth      │
+├────────────────┼────────────────┼─────────────────────────────────┤
+│ Firestore      │ 127.0.0.1:8002 │ http://127.0.0.1:8000/firestore │
+├────────────────┼────────────────┼─────────────────────────────────┤
+│ Database       │ 127.0.0.1:8003 │ http://127.0.0.1:8000/database  │
+└────────────────┴────────────────┴─────────────────────────────────┘
+  Emulator Hub host: 127.0.0.1 port: 4400
+  Other reserved ports: 4500, 9150
+
+Issues? Report them at https://github.com/firebase/firebase-tools/issues and attach the *-debug.log files.
+ 
+[debug] [2025-11-24T01:14:02.548Z] Nov 24, 2025 9:14:02 AM com.google.cloud.datastore.emulator.firestore.websocket.WebSocketChannelHandler initChannel
+INFO: Connected to new websocket client
+ {"metadata":{"emulator":{"name":"firestore"},"message":"Nov 24, 2025 9:14:02 AM com.google.cloud.datastore.emulator.firestore.websocket.WebSocketChannelHandler initChannel\r\nINFO: Connected to new websocket client\r\n"}}

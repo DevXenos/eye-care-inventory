@@ -1,0 +1,56 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# production
+/build
+
+# misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# deployment
+.vercel
+
+# Firebase Emulators
+.firebaserc
+database-debug.log
+firestore-debug.log
+firestore.indexes.json
+# database.rules.json   # keep commented if you want in repo
+# firebase.json         # keep commented if you want in repo
+# firestore.rules       # keep commented if you want in repo
+
+# package manager cache
+.npm/
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+
+# IDE/editor junk
+.vscode/
+.idea/
+*.swp
+
+# OS junk
+Thumbs.db
+
+__emulator-data/
+emulator-data/
+
+__firebase-export-1763487577756HUvIu7/
+firebase-export-1763487577756HUvIu7

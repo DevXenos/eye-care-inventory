@@ -1,0 +1,6 @@
+-- System should be focus on inventory (Remove Customer Name)
+-- Add List for Supplier
+-- Add notification/Alert if products is below 10
+-- Record(History) of stock is viewable
+-- (Physical) Borrow a simple public data from eye care
+-- (Supplier) Add a list of deffects na nabili from supplier
